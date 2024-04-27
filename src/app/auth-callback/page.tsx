@@ -2,8 +2,8 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { trpc } from "../_trpc/client";
-import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
+import { Suspense } from "react";
 
 const Page = () => {
   const router = useRouter();
@@ -14,7 +14,6 @@ const Page = () => {
   trpc.authCallback.useQuery(undefined, {
     onSuccess: ({ success }) => {
       if (success) {
-        // user is synced to db
         router.push(origin ? `/${origin}` : "/dashboard");
       }
     },
@@ -39,3 +38,11 @@ const Page = () => {
 };
 
 export default Page;
+
+export function SuspendedPage() {
+  return (
+    <Suspense>
+      <Page />
+    </Suspense>
+  );
+}

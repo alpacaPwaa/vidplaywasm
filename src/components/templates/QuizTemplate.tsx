@@ -19,21 +19,6 @@ export default function QuizTemplate() {
     setPromptText(e.target.value);
   };
 
-  const load = async () => {
-    const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
-    const ffmpeg = ffmpegRef.current;
-    ffmpeg.on("log", ({ message }) => {
-      if (messageRef.current) messageRef.current.innerHTML = message;
-    });
-    await ffmpeg.load({
-      coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
-      wasmURL: await toBlobURL(
-        `${baseURL}/ffmpeg-core.wasm`,
-        "application/wasm"
-      ),
-    });
-  };
-
   const transcode = async () => {
     const ffmpeg = ffmpegRef.current;
     await ffmpeg.writeFile("input.mp4", await fetchFile(videoFile));
@@ -63,6 +48,30 @@ export default function QuizTemplate() {
   };
 
   useEffect(() => {
+    const load = async () => {
+      if (typeof window !== "undefined") {
+        const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
+        const ffmpeg = ffmpegRef.current;
+        ffmpeg.on("log", ({ message }) => {
+          if (messageRef.current) messageRef.current.innerHTML = message;
+        });
+        await ffmpeg.load({
+          coreURL: await toBlobURL(
+            `${baseURL}/ffmpeg-core.js`,
+            "text/javascript"
+          ),
+          wasmURL: await toBlobURL(
+            `${baseURL}/ffmpeg-core.wasm`,
+            "application/wasm"
+          ),
+        });
+      } else {
+        throw new Error(
+          "Window is not defined. FFmpeg can only be loaded in a browser environment."
+        );
+      }
+    };
+
     load();
   }, []);
 

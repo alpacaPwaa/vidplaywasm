@@ -3,7 +3,6 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { trpc } from "../_trpc/client";
 import { useEffect } from "react";
-import { Suspense } from "react";
 import { Loader2 } from "lucide-react";
 
 const Page = () => {
@@ -40,11 +39,3 @@ const Page = () => {
 };
 
 export default Page;
-
-export function SupspendedPage() {
-  return (
-    <Suspense>
-      <Page />
-    </Suspense>
-  );
-}

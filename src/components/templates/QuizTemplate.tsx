@@ -63,7 +63,12 @@ export default function QuizTemplate() {
   };
 
   useEffect(() => {
-    load();
+    (async () => {
+      if (typeof window === "undefined") return;
+      const ffmpeg = new FFmpeg();
+      ffmpegRef.current = ffmpeg;
+      await load();
+    })();
   }, []);
 
   return (

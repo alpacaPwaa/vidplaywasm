@@ -1,3 +1,5 @@
+"use client";
+
 import QuizTemplate from "@/components/templates/QuizTemplate";
 
 const Page = async () => {

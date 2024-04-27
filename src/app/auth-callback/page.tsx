@@ -37,8 +37,6 @@ const Page = () => {
   );
 };
 
-export default Page;
-
 export function SuspendedPage() {
   return (
     <Suspense>

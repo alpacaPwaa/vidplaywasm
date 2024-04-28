@@ -178,7 +178,7 @@ export default function QuizTemplate() {
                         ) : (
                           <div className="flex flex-col items-center gap-2 p-4">
                             <Ghost className="h-8 w-8 text-zinc-800" />
-                            <h3 className="font-semibold text-xl">
+                            <h3 className="font-semibold text-lg">
                               Pretty empty around here
                             </h3>
                             <p>Let&apos;s generate you first quiz.</p>

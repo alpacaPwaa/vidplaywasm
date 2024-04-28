@@ -119,6 +119,7 @@ export const appRouter = router({
       console.log("Answer:", firstAnswer);
 
       return {
+        firstQuestionText,
         joinedFirstQuestionAndChoices,
         firstAnswer,
       };

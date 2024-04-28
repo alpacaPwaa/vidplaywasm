@@ -5,6 +5,8 @@ import { fetchFile, toBlobURL } from "@ffmpeg/util";
 import { useEffect, useRef, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/app/_trpc/client";
+import { Button } from "../ui/button";
+import { Ghost, Loader2 } from "lucide-react";
 
 export default function QuizTemplate() {
   const [transcodeFile, setTranscodeFile] = useState<string | null>(null);
@@ -13,6 +15,7 @@ export default function QuizTemplate() {
   const ffmpegRef = useRef(new FFmpeg());
   const messageRef = useRef<HTMLParagraphElement | null>(null);
 
+  const [originalFirstQuestion, setOriginalFirstQuestion] = useState("");
   const [firstQuestion, setFirstQuestion] = useState("");
   const [firstAnswer, setFirstAnswer] = useState("");
 
@@ -22,9 +25,11 @@ export default function QuizTemplate() {
   const { mutate: generateQuizScript, isLoading } =
     trpc.generateQuizScript.useMutation({
       onSuccess: async (data) => {
+        const origquestion1 = data.firstQuestionText;
         const question1 = data.joinedFirstQuestionAndChoices;
         const answer1 = data.firstAnswer;
 
+        setOriginalFirstQuestion(origquestion1);
         setFirstQuestion(question1);
         setFirstAnswer(answer1);
 
@@ -118,7 +123,7 @@ export default function QuizTemplate() {
         <div className="flex-1 xl:flex">
           <div className="px-4 py-6 sm:px-6 lg:pl-8 xl:flex-1 xl:pl-6 bg-zinc-50">
             <Tabs defaultValue="details" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-2 mb-6">
                 <TabsTrigger value="details">Details</TabsTrigger>
                 <TabsTrigger value="video">Video</TabsTrigger>
               </TabsList>
@@ -127,33 +132,75 @@ export default function QuizTemplate() {
                   onSubmit={handleGenerateQuiz}
                   className="flex flex-col space-y-5"
                 >
-                  <div className="relative flex flex-col space-y-3">
-                    <label htmlFor="text-area" className="text-md font-medium">
-                      Enter a topic
-                    </label>
-                    <textarea
-                      id="text-area"
-                      name="prompt"
-                      value={promptText}
-                      onChange={handleChangePrompt}
-                      className={`w-full rounded-md border ${
-                        promtError ? "border-red-500" : "border-gray-300"
-                      } p-2 text-gray-800 bg-zinc-50 focus:border-blue-500 focus:outline-none`}
-                      style={{
-                        borderRadius: "8px",
-                        width: "100%",
-                      }}
-                      placeholder="Example: Geography Quiz"
-                    />
+                  <div className="relative flex flex-col space-y-7">
+                    <div className="relative flex flex-col space-y-3">
+                      <label
+                        htmlFor="text-area"
+                        className="text-md font-medium"
+                      >
+                        Enter a topic
+                      </label>
+                      <textarea
+                        id="text-area"
+                        name="prompt"
+                        value={promptText}
+                        onChange={handleChangePrompt}
+                        className={`w-full rounded-md border ${
+                          promtError ? "border-red-500" : "border-gray-300"
+                        } p-2 text-gray-800 bg-zinc-50 focus:border-blue-500 focus:outline-none`}
+                        style={{
+                          borderRadius: "8px",
+                          width: "100%",
+                          height: "100px",
+                        }}
+                        placeholder="Example: Geography Quiz"
+                      />
+                    </div>
 
-                    <button
+                    <div className="relative flex flex-col space-y-3">
+                      <label
+                        htmlFor="template-videos"
+                        className="text-md font-medium"
+                      >
+                        Script
+                      </label>
+                      <div
+                        id="template-videos"
+                        className="relative flex flex-col space-y-3 max-h-[170px] overflow-y-auto border border-gray-300 rounded-md p-3"
+                      >
+                        {firstQuestion ? (
+                          <>
+                            <div className="relative flex flex-col space-y-3">
+                              <div>Question: {firstQuestion}</div>
+                              <div>Answer: {firstAnswer}</div>
+                            </div>
+                          </>
+                        ) : (
+                          <div className="flex flex-col items-center gap-2 p-4">
+                            <Ghost className="h-8 w-8 text-zinc-800" />
+                            <h3 className="font-semibold text-xl">
+                              Pretty empty around here
+                            </h3>
+                            <p>Let&apos;s generate you first quiz.</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <Button
                       type="submit"
+                      disabled={isLoading}
+                      variant="destructive"
                       className={
                         "bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-600 transition duration-300 ease-in-out"
                       }
                     >
-                      Generate Quiz
-                    </button>
+                      {isLoading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        "Generate Quiz"
+                      )}
+                    </Button>
                   </div>
                 </form>
               </TabsContent>

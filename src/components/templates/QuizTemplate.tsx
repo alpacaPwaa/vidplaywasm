@@ -4,6 +4,7 @@ import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
 import { useEffect, useRef, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { trpc } from "@/app/_trpc/client";
 
 export default function QuizTemplate() {
   const [transcodeFile, setTranscodeFile] = useState<string | null>(null);
@@ -12,8 +13,43 @@ export default function QuizTemplate() {
   const ffmpegRef = useRef(new FFmpeg());
   const messageRef = useRef<HTMLParagraphElement | null>(null);
 
+  const [firstQuestion, setFirstQuestion] = useState("");
+  const [firstAnswer, setFirstAnswer] = useState("");
+
   const [promptText, setPromptText] = useState("");
   const [promtError, setPromptError] = useState("");
+
+  const { mutate: generateQuizScript, isLoading } =
+    trpc.generateQuizScript.useMutation({
+      onSuccess: async (data) => {
+        const question1 = data.joinedFirstQuestionAndChoices;
+        const answer1 = data.firstAnswer;
+
+        setFirstQuestion(question1);
+        setFirstAnswer(answer1);
+
+        console.log("First Question", question1);
+      },
+      onError: (error) => {
+        console.error("Error Generating Quiz:", error);
+      },
+    });
+
+  const handleGenerateQuiz = (e: React.FormEvent<HTMLElement>) => {
+    e.preventDefault();
+    if (!promptText) {
+      setPromptError("Please write a prompt");
+      return; // Early return if prompt is empty
+    }
+    console.log("clicked"); // Log before mutation
+
+    try {
+      generateQuizScript({ promt: promptText });
+    } catch (error) {
+      console.error("Error Generating Quiz:", error);
+      // Handle error gracefully, e.g., display an error message to the user
+    }
+  };
 
   const handleChangePrompt = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setPromptText(e.target.value);
@@ -34,7 +70,7 @@ export default function QuizTemplate() {
       "-i",
       "input.mp4",
       "-vf",
-      "drawtext=fontfile=/arial.ttf:text='First Text':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=24:fontcolor=white:enable='between(t,0,8)',drawtext=fontfile=/arial.ttf:text='Second Text':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=24:fontcolor=white:enable='between(t,8,10)'",
+      `drawtext=fontfile=/arial.ttf:text='${firstQuestion}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=24:fontcolor=white:enable='between(t,0,8)',drawtext=fontfile=/arial.ttf:text='${firstAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=24:fontcolor=white:enable='between(t,8,10)'`,
       "-preset",
       "ultrafast",
       "output.mp4",
@@ -87,7 +123,10 @@ export default function QuizTemplate() {
                 <TabsTrigger value="video">Video</TabsTrigger>
               </TabsList>
               <TabsContent value="details">
-                <div className="flex flex-col space-y-5">
+                <form
+                  onSubmit={handleGenerateQuiz}
+                  className="flex flex-col space-y-5"
+                >
                   <div className="relative flex flex-col space-y-3">
                     <label htmlFor="text-area" className="text-md font-medium">
                       Enter a topic
@@ -108,6 +147,7 @@ export default function QuizTemplate() {
                     />
 
                     <button
+                      type="submit"
                       className={
                         "bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-600 transition duration-300 ease-in-out"
                       }
@@ -115,7 +155,7 @@ export default function QuizTemplate() {
                       Generate Quiz
                     </button>
                   </div>
-                </div>
+                </form>
               </TabsContent>
               <TabsContent value="video">
                 <div className="flex flex-col space-y-5">
@@ -218,7 +258,11 @@ export default function QuizTemplate() {
           <div className="max-h-[540px] overflow-y-auto">
             {transcodeFile ? (
               <div className="flex flex-col justify-center items-center space-y-6">
-                <video src={transcodeFile} controls />
+                <video
+                  src={transcodeFile}
+                  controls
+                  style={{ maxWidth: "30%", maxHeight: "30%" }}
+                />
               </div>
             ) : (
               <p>Select a Background Video to Get Started</p>

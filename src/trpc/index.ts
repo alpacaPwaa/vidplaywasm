@@ -4,6 +4,11 @@ import { TRPCError } from "@trpc/server";
 import OpenAI from "openai";
 import { db } from "@/db";
 import { z } from "zod";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { Upload } from "@aws-sdk/lib-storage";
+import crypto from "crypto";
+import { PassThrough } from "stream";
 
 export const appRouter = router({
   authCallback: publicProcedure.query(async () => {
@@ -119,9 +124,88 @@ export const appRouter = router({
       console.log("Answer:", firstAnswer);
 
       return {
-        firstQuestionText,
+        firstQuestion,
         joinedFirstQuestionAndChoices,
         firstAnswer,
+      };
+    }),
+
+  generateQuizSpeech: privateProcedure
+    .input(
+      z.object({
+        speechVoice: z.enum([
+          "alloy",
+          "echo",
+          "fable",
+          "onyx",
+          "nova",
+          "shimmer",
+        ]),
+        firstQuestion: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const generateFirstFileName = (bytes = 32) =>
+        crypto.randomBytes(bytes).toString("hex");
+      const firstSpeechURL = generateFirstFileName();
+
+      const openai = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+      });
+
+      const s3 = new S3Client({
+        region: process.env.AWS_BUCKET_REGION!,
+        credentials: {
+          accessKeyId: process.env.AWS_BUCKET_ACCESS_KEY!,
+          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+        },
+      });
+
+      const putObjectCommand = new PutObjectCommand({
+        Bucket: process.env.AWS_BUCKET_NAME!,
+        Key: firstSpeechURL,
+      });
+
+      const firstSingedURL = await getSignedUrl(s3, putObjectCommand, {
+        expiresIn: 60,
+      });
+
+      const firstQuestionSpeech = await openai.audio.speech.create({
+        model: "tts-1",
+        voice: input.speechVoice,
+        input: input.firstQuestion,
+      });
+
+      const firstQuestionBuffer = Buffer.from(
+        await firstQuestionSpeech.arrayBuffer()
+      );
+
+      const uploadToS3 = async (stream: PassThrough) => {
+        const upload = new Upload({
+          client: s3,
+          params: {
+            Bucket: process.env.AWS_BUCKET_NAME!,
+            Key: firstSpeechURL,
+            Body: stream,
+            ContentType: "audio/mpeg",
+          },
+        });
+        await upload.done();
+      };
+
+      const passThroughStream = new PassThrough();
+      passThroughStream.write(firstQuestionBuffer);
+      passThroughStream.end();
+
+      await uploadToS3(passThroughStream);
+
+      console.log(
+        `Uploaded TTS audio to S3: s3://${process.env
+          .AWS_BUCKET_NAME!}/${generateFirstFileName()}`
+      );
+
+      return {
+        firstSpeech: firstSingedURL.split("?")[0],
       };
     }),
 });

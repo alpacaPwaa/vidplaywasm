@@ -2,41 +2,60 @@
 
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
-import { useEffect, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/app/_trpc/client";
 import { Button } from "../ui/button";
-import { Ghost, Loader2 } from "lucide-react";
+import { Ghost, Loader2, Upload } from "lucide-react";
 
 export default function QuizTemplate() {
   const [transcodeFile, setTranscodeFile] = useState<string | null>(null);
   const [videoFile, setVideoFile] = useState("/templates/template1/video1.mp4");
+  const [voice, setVoice] = useState<
+    "alloy" | "echo" | "fable" | "onyx" | "nova" | "shimmer"
+  >("alloy");
 
   const ffmpegRef = useRef(new FFmpeg());
   const messageRef = useRef<HTMLParagraphElement | null>(null);
 
-  const [originalFirstQuestion, setOriginalFirstQuestion] = useState("");
+  const [firstSpeechError, setfirstSpeechError] = useState("");
+  const [firstSpeechDownload, setFirstSpeechDownload] = useState<string>("");
+
+  const [firstQuestionOnly, setFirstQuestionOnly] = useState("");
   const [firstQuestion, setFirstQuestion] = useState("");
   const [firstAnswer, setFirstAnswer] = useState("");
 
   const [promptText, setPromptText] = useState("");
   const [promtError, setPromptError] = useState("");
 
-  const { mutate: generateQuizScript, isLoading } =
+  const { mutate: generateQuizScript, isLoading: isQuizScriptLoading } =
     trpc.generateQuizScript.useMutation({
       onSuccess: async (data) => {
-        const origquestion1 = data.firstQuestionText;
-        const question1 = data.joinedFirstQuestionAndChoices;
+        const question1 = data.firstQuestion;
+        const joinedQuestion1 = data.joinedFirstQuestionAndChoices;
         const answer1 = data.firstAnswer;
 
-        setOriginalFirstQuestion(origquestion1);
-        setFirstQuestion(question1);
+        setFirstQuestionOnly(question1);
+        setFirstQuestion(joinedQuestion1);
         setFirstAnswer(answer1);
 
-        console.log("First Question", question1);
+        console.log("First Question", joinedQuestion1);
       },
       onError: (error) => {
         console.error("Error Generating Quiz:", error);
+      },
+    });
+
+  const { mutate: generateTtsSpeech, isLoading: isSpeechLoading } =
+    trpc.generateQuizSpeech.useMutation({
+      onSuccess: async (data) => {
+        const firstSpeechFile = data.firstSpeech;
+
+        setFirstSpeechDownload(firstSpeechFile);
+        console.log("First Speech Done", firstSpeechFile);
+      },
+      onError: (error) => {
+        console.error("Error Generating Speech:", error);
       },
     });
 
@@ -51,6 +70,25 @@ export default function QuizTemplate() {
     try {
       generateQuizScript({ promt: promptText });
     } catch (error) {
+      console.error("Error Generating Speech:", error);
+      // Handle error gracefully, e.g., display an error message to the user
+    }
+  };
+
+  const handleGenerateSpeech = (e: React.FormEvent<HTMLElement>) => {
+    e.preventDefault();
+    if (!firstQuestionOnly) {
+      setfirstSpeechError("Please generate a quiz first");
+      return; // Early return if prompt is empty
+    }
+    console.log("clicked"); // Log before mutation
+
+    try {
+      generateTtsSpeech({
+        firstQuestion: firstQuestionOnly,
+        speechVoice: voice,
+      });
+    } catch (error) {
       console.error("Error Generating Quiz:", error);
       // Handle error gracefully, e.g., display an error message to the user
     }
@@ -63,6 +101,7 @@ export default function QuizTemplate() {
   const transcode = async () => {
     const ffmpeg = ffmpegRef.current;
     await ffmpeg.writeFile("input.mp4", await fetchFile(videoFile));
+    await ffmpeg.writeFile("input.mp3", await fetchFile(firstSpeechDownload)); // Using the uploaded speech file
     await ffmpeg.writeFile(
       "arial.ttf",
       await fetchFile(
@@ -70,14 +109,20 @@ export default function QuizTemplate() {
       )
     );
 
-    // Command for adding both text overlays in a single pass
+    // Command for adding text overlay and speech file to the input video
     await ffmpeg.exec([
       "-i",
       "input.mp4",
+      "-i",
+      "input.mp3",
       "-vf",
-      `drawtext=fontfile=/arial.ttf:text='${firstQuestion}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=24:fontcolor=white:enable='between(t,0,8)',drawtext=fontfile=/arial.ttf:text='${firstAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=24:fontcolor=white:enable='between(t,8,10)'`,
+      `drawtext=fontfile=/arial.ttf:text='${firstQuestion}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=24:fontcolor=white:enable='between(t,0,8)', drawtext=fontfile=/arial.ttf:text='${firstAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=24:fontcolor=white:enable='between(t,8,10)'`,
       "-preset",
       "ultrafast",
+      "-c:a",
+      "aac",
+      "-c:v",
+      "libx264",
       "output.mp4",
     ]);
 
@@ -123,8 +168,9 @@ export default function QuizTemplate() {
         <div className="flex-1 xl:flex">
           <div className="px-4 py-6 sm:px-6 lg:pl-8 xl:flex-1 xl:pl-6 bg-zinc-50">
             <Tabs defaultValue="details" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsList className="grid w-full grid-cols-3 mb-6">
                 <TabsTrigger value="details">Details</TabsTrigger>
+                <TabsTrigger value="TTS">Text to Speech</TabsTrigger>
                 <TabsTrigger value="video">Video</TabsTrigger>
               </TabsList>
               <TabsContent value="details">
@@ -171,7 +217,9 @@ export default function QuizTemplate() {
                         {firstQuestion ? (
                           <>
                             <div className="relative flex flex-col space-y-3">
-                              <div>Question: {firstQuestion}</div>
+                              <div className="whitespace-pre">
+                                {firstQuestion}
+                              </div>
                               <div>Answer: {firstAnswer}</div>
                             </div>
                           </>
@@ -189,13 +237,13 @@ export default function QuizTemplate() {
 
                     <Button
                       type="submit"
-                      disabled={isLoading}
+                      disabled={isQuizScriptLoading}
                       variant="destructive"
                       className={
                         "bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-600 transition duration-300 ease-in-out"
                       }
                     >
-                      {isLoading ? (
+                      {isQuizScriptLoading ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
                         "Generate Quiz"
@@ -204,6 +252,148 @@ export default function QuizTemplate() {
                   </div>
                 </form>
               </TabsContent>
+
+              <TabsContent value="TTS">
+                <form
+                  onSubmit={handleGenerateSpeech}
+                  className="flex flex-col space-y-5"
+                >
+                  <div className="relative flex flex-col space-y-7">
+                    <div className="relative flex flex-col space-y-3">
+                      <label
+                        htmlFor="template-videos"
+                        className="text-md font-medium"
+                      >
+                        Select a Voice
+                      </label>
+                      <div
+                        id="template-videos"
+                        className="relative flex flex-col space-y-3 max-h-[110px] overflow-y-auto border border-gray-300 rounded-md p-3"
+                      >
+                        <div
+                          className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
+                            voice === "alloy"
+                              ? "border-blue-500"
+                              : "border-gray-300"
+                          }`}
+                          onClick={() => setVoice("alloy")}
+                        >
+                          <div className="h-full flex font-medium text-md">
+                            Alloy
+                          </div>
+                        </div>
+                        <div
+                          className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
+                            voice === "echo"
+                              ? "border-blue-500"
+                              : "border-gray-300"
+                          }`}
+                          onClick={() => setVoice("echo")}
+                        >
+                          <div className="h-full flex font-medium text-md">
+                            Echo
+                          </div>
+                        </div>
+                        <div
+                          className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
+                            voice === "fable"
+                              ? "border-blue-500"
+                              : "border-gray-300"
+                          }`}
+                          onClick={() => setVoice("fable")}
+                        >
+                          <div className="h-full flex font-medium text-md">
+                            Fable
+                          </div>
+                        </div>
+                        <div
+                          className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
+                            voice === "onyx"
+                              ? "border-blue-500"
+                              : "border-gray-300"
+                          }`}
+                          onClick={() => setVoice("onyx")}
+                        >
+                          <div className="h-full flex font-medium text-md">
+                            Onyx
+                          </div>
+                        </div>
+                        <div
+                          className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
+                            voice === "nova"
+                              ? "border-blue-500"
+                              : "border-gray-300"
+                          }`}
+                          onClick={() => setVoice("nova")}
+                        >
+                          <div className="h-full flex font-medium text-md">
+                            Nova
+                          </div>
+                        </div>
+                        <div
+                          className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
+                            voice === "shimmer"
+                              ? "border-blue-500"
+                              : "border-gray-300"
+                          }`}
+                          onClick={() => setVoice("shimmer")}
+                        >
+                          <div className="h-full flex font-medium text-md">
+                            Shimmer
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="relative flex flex-col space-y-3">
+                      <label
+                        htmlFor="text-to-speech"
+                        className="text-md font-medium"
+                      >
+                        Text to Speech
+                      </label>
+                      <div
+                        id="text-to-speech"
+                        className="relative flex flex-col space-y-3 max-h-[170px] overflow-y-auto border border-gray-300 rounded-md p-3"
+                      >
+                        {firstSpeechDownload ? (
+                          <div className="relative flex flex-col space-y-3">
+                            <audio
+                              src={firstSpeechDownload}
+                              className="flex w-full"
+                              controls
+                            />
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center gap-2 p-4">
+                            <Ghost className="h-8 w-8 text-zinc-800" />
+                            <h3 className="font-semibold text-lg">
+                              Pretty empty around here
+                            </h3>
+                            <p>Let&apos;s generate your TTS.</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <Button
+                      type="submit"
+                      disabled={isSpeechLoading}
+                      variant="destructive"
+                      className={
+                        "bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-600 transition duration-300 ease-in-out"
+                      }
+                    >
+                      {isSpeechLoading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        "Generate Text to Speech"
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              </TabsContent>
+
               <TabsContent value="video">
                 <div className="flex flex-col space-y-5">
                   <div className="relative flex flex-col space-y-3">

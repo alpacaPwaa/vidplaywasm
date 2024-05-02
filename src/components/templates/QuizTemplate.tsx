@@ -2,11 +2,11 @@
 
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/app/_trpc/client";
 import { Button } from "../ui/button";
-import { Ghost, Loader2, Upload } from "lucide-react";
+import { Ghost, Loader2 } from "lucide-react";
 
 export default function QuizTemplate() {
   const [transcodeFile, setTranscodeFile] = useState<string | null>(null);
@@ -20,10 +20,30 @@ export default function QuizTemplate() {
 
   const [firstSpeechError, setfirstSpeechError] = useState("");
   const [firstSpeechDownload, setFirstSpeechDownload] = useState<string>("");
+  const [secondSpeechDownload, setSecondSpeechDownload] = useState<string>("");
+  const [thirdSpeechDownload, setThirdSpeechDownload] = useState<string>("");
+  const [fourthSpeechDownload, setFourthSpeechDownload] = useState<string>("");
+  const [fifthSpeechDownload, setFifthSpeechDownload] = useState<string>("");
 
   const [firstQuestionOnly, setFirstQuestionOnly] = useState("");
   const [firstQuestion, setFirstQuestion] = useState("");
   const [firstAnswer, setFirstAnswer] = useState("");
+
+  const [secondQuestionOnly, setSecondQuestionOnly] = useState("");
+  const [secondQuestion, setSecondQuestion] = useState("");
+  const [secondAnswer, setSecondAnswer] = useState("");
+
+  const [thirdQuestionOnly, setThirdQuestionOnly] = useState("");
+  const [thirdQuestion, setThirdQuestion] = useState("");
+  const [thirdAnswer, setThirdAnswer] = useState("");
+
+  const [fourthQuestionOnly, setFourthQuestionOnly] = useState("");
+  const [fourthQuestion, setFourthQuestion] = useState("");
+  const [fourthAnswer, setFourthAnswer] = useState("");
+
+  const [fifthQuestionOnly, setFifthQuestionOnly] = useState("");
+  const [fifthQuestion, setFifthQuestion] = useState("");
+  const [fifthAnswer, setFifthAnswer] = useState("");
 
   const [promptText, setPromptText] = useState("");
   const [promtError, setPromptError] = useState("");
@@ -35,11 +55,47 @@ export default function QuizTemplate() {
         const joinedQuestion1 = data.joinedFirstQuestionAndChoices;
         const answer1 = data.firstAnswer;
 
+        const question2 = data.secondQuestion;
+        const joinedQuestion2 = data.joinedSecondQuestionAndChoices;
+        const answer2 = data.secondAnswer;
+
+        const question3 = data.thirdQuestion;
+        const joinedQuestion3 = data.joinedThirdQuestionAndChoices;
+        const answer3 = data.thirdAnswer;
+
+        const question4 = data.fourthQuestion;
+        const joinedQuestion4 = data.joinedFourthQuestionAndChoices;
+        const answer4 = data.fourthAnswer;
+
+        const question5 = data.fifthQuestion;
+        const joinedQuestion5 = data.joinedFifthQuestionAndChoices;
+        const answer5 = data.fifthAnswer;
+
         setFirstQuestionOnly(question1);
         setFirstQuestion(joinedQuestion1);
         setFirstAnswer(answer1);
 
+        setSecondQuestionOnly(question2);
+        setSecondQuestion(joinedQuestion2);
+        setSecondAnswer(answer2);
+
+        setThirdQuestionOnly(question3);
+        setThirdQuestion(joinedQuestion3);
+        setThirdAnswer(answer3);
+
+        setFourthQuestionOnly(question4);
+        setFourthQuestion(joinedQuestion4);
+        setFourthAnswer(answer4);
+
+        setFifthQuestionOnly(question5);
+        setFifthQuestion(joinedQuestion5);
+        setFifthAnswer(answer5);
+
         console.log("First Question", joinedQuestion1);
+        console.log("Second Question", joinedQuestion2);
+        console.log("Third Question", joinedQuestion3);
+        console.log("Fourth Question", joinedQuestion4);
+        console.log("Fifth Question", joinedQuestion5);
       },
       onError: (error) => {
         console.error("Error Generating Quiz:", error);
@@ -50,9 +106,21 @@ export default function QuizTemplate() {
     trpc.generateQuizSpeech.useMutation({
       onSuccess: async (data) => {
         const firstSpeechFile = data.firstSpeech;
+        const secondSpeechFile = data.secondSpeech;
+        const thirdSpeechFile = data.thirdSpeech;
+        const fourthSpeechFile = data.fourthSpeech;
+        const fifthSpeechFile = data.fifthSpeech;
 
         setFirstSpeechDownload(firstSpeechFile);
+        setSecondSpeechDownload(secondSpeechFile);
+        setThirdSpeechDownload(thirdSpeechFile);
+        setFourthSpeechDownload(fourthSpeechFile);
+        setFifthSpeechDownload(fifthSpeechFile);
         console.log("First Speech Done", firstSpeechFile);
+        console.log("Second Speech Done", secondSpeechFile);
+        console.log("Third Speech Done", thirdSpeechFile);
+        console.log("Fourth Speech Done", fourthSpeechFile);
+        console.log("Fifth Speech Done", fifthSpeechFile);
       },
       onError: (error) => {
         console.error("Error Generating Speech:", error);
@@ -86,6 +154,10 @@ export default function QuizTemplate() {
     try {
       generateTtsSpeech({
         firstQuestion: firstQuestionOnly,
+        secondQuestion: secondQuestionOnly,
+        thirdQuestion: thirdQuestionOnly,
+        fourthQuestion: fourthQuestionOnly,
+        fifthQuestion: fifthQuestionOnly,
         speechVoice: voice,
       });
     } catch (error) {
@@ -101,7 +173,6 @@ export default function QuizTemplate() {
   const transcode = async () => {
     const ffmpeg = ffmpegRef.current;
     await ffmpeg.writeFile("input.mp4", await fetchFile(videoFile));
-    await ffmpeg.writeFile("input.mp3", await fetchFile(firstSpeechDownload)); // Using the uploaded speech file
     await ffmpeg.writeFile(
       "arial.ttf",
       await fetchFile(
@@ -113,18 +184,44 @@ export default function QuizTemplate() {
     await ffmpeg.exec([
       "-i",
       "input.mp4",
-      "-i",
-      "input.mp3",
       "-vf",
-      `drawtext=fontfile=/arial.ttf:text='${firstQuestion}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=24:fontcolor=white:enable='between(t,0,8)', drawtext=fontfile=/arial.ttf:text='${firstAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=24:fontcolor=white:enable='between(t,8,10)'`,
+      `drawtext=fontfile=/arial.ttf:text='${firstQuestion}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=55:fontcolor=white:enable='between(t,5,13)',
+      drawtext=fontfile=/arial.ttf:text='${firstAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=55:fontcolor=white:enable='between(t,13,15)',
+      drawtext=fontfile=/arial.ttf:text='${secondQuestion}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=55:fontcolor=white:enable='between(t,15,23)',
+      drawtext=fontfile=/arial.ttf:text='${secondAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=55:fontcolor=white:enable='between(t,23,25)',
+      drawtext=fontfile=/arial.ttf:text='${thirdQuestion}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=55:fontcolor=white:enable='between(t,25,33)',
+      drawtext=fontfile=/arial.ttf:text='${thirdAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=55:fontcolor=white:enable='between(t,33,35)',
+      drawtext=fontfile=/arial.ttf:text='${fourthQuestion}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=55:fontcolor=white:enable='between(t,35,43)',
+      drawtext=fontfile=/arial.ttf:text='${fourthAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=55:fontcolor=white:enable='between(t,43,45)',
+      drawtext=fontfile=/arial.ttf:text='${fifthQuestion}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=55:fontcolor=white:enable='between(t,45,53)',
+      drawtext=fontfile=/arial.ttf:text='${fifthAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=55:fontcolor=white:enable='between(t,53,55)'`,
       "-preset",
       "ultrafast",
       "-c:a",
-      "aac",
+      "copy",
       "-c:v",
       "libx264",
       "output.mp4",
     ]);
+
+    // await ffmpeg.exec([
+    //   "-an",
+    //   "-i",
+    //   "input.mp4",
+    //   "-i",
+    //   "firstSpeechInput.mp3",
+    //   "-i",
+    //   "secondSpeechInput.mp3",
+    //   "-filter_complex",
+    //   "[2]adelay=10000|10000[a1];[a1][1]amix=inputs=2[a]",
+    //   "-map",
+    //   "0:v",
+    //   "-map",
+    //   "[a]",
+    //   "-c:v",
+    //   "copy",
+    //   "output.mp4",
+    // ]);
 
     const data = (await ffmpeg.readFile("output.mp4")) as any;
     const url = URL.createObjectURL(
@@ -163,7 +260,7 @@ export default function QuizTemplate() {
 
   return (
     <div className="flex-1 justify-between flex flex-col h-[calc(100vh-3.5rem)]">
-      <div className="mx-auto w-full max-w-8xl grow lg:flex xl:px-2">
+      <div className="mx-auto w-full max-w-8xl grow lg:flex">
         {/* Left sidebar */}
         <div className="flex-1 xl:flex">
           <div className="px-4 py-6 sm:px-6 lg:pl-8 xl:flex-1 xl:pl-6 bg-zinc-50">
@@ -221,6 +318,30 @@ export default function QuizTemplate() {
                                 {firstQuestion}
                               </div>
                               <div>Answer: {firstAnswer}</div>
+                            </div>
+                            <div className="relative flex flex-col space-y-3">
+                              <div className="whitespace-pre">
+                                {secondQuestion}
+                              </div>
+                              <div>Answer: {secondAnswer}</div>
+                            </div>
+                            <div className="relative flex flex-col space-y-3">
+                              <div className="whitespace-pre">
+                                {thirdQuestion}
+                              </div>
+                              <div>Answer: {thirdAnswer}</div>
+                            </div>
+                            <div className="relative flex flex-col space-y-3">
+                              <div className="whitespace-pre">
+                                {fourthQuestion}
+                              </div>
+                              <div>Answer: {fourthAnswer}</div>
+                            </div>
+                            <div className="relative flex flex-col space-y-3">
+                              <div className="whitespace-pre">
+                                {fifthQuestion}
+                              </div>
+                              <div>Answer: {fifthAnswer}</div>
                             </div>
                           </>
                         ) : (
@@ -363,6 +484,26 @@ export default function QuizTemplate() {
                               className="flex w-full"
                               controls
                             />
+                            <audio
+                              src={secondSpeechDownload}
+                              className="flex w-full"
+                              controls
+                            />
+                            <audio
+                              src={thirdSpeechDownload}
+                              className="flex w-full"
+                              controls
+                            />
+                            <audio
+                              src={fourthSpeechDownload}
+                              className="flex w-full"
+                              controls
+                            />
+                            <audio
+                              src={fifthSpeechDownload}
+                              className="flex w-full"
+                              controls
+                            />
                           </div>
                         ) : (
                           <div className="flex flex-col items-center gap-2 p-4">
@@ -470,6 +611,28 @@ export default function QuizTemplate() {
                         <div className="template-info text-center flex-grow pl-3">
                           <div className="h-full flex font-medium text-md">
                             Video 3
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
+                          videoFile === "/templates/template1/video4.mp4"
+                            ? "border-blue-500"
+                            : "border-gray-300"
+                        }`}
+                        onClick={() =>
+                          setVideoFile("/templates/template1/video4.mp4")
+                        }
+                      >
+                        <div className="template-video bg-gray-200 rounded-sm">
+                          <video
+                            src="/templates/template1/video4.mp4"
+                            className="w-20 h-12 p-1"
+                          ></video>
+                        </div>
+                        <div className="template-info text-center flex-grow pl-3">
+                          <div className="h-full flex font-medium text-md">
+                            Video 4
                           </div>
                         </div>
                       </div>

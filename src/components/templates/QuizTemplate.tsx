@@ -105,11 +105,14 @@ export default function QuizTemplate() {
   const { mutate: generateTtsSpeech, isLoading: isSpeechLoading } =
     trpc.generateQuizSpeech.useMutation({
       onSuccess: async (data) => {
-        const firstSpeechFile = data.firstSpeech;
-        const secondSpeechFile = data.secondSpeech;
-        const thirdSpeechFile = data.thirdSpeech;
-        const fourthSpeechFile = data.fourthSpeech;
-        const fifthSpeechFile = data.fifthSpeech;
+        // Assuming data contains an array of speechURLs
+        const [
+          firstSpeechFile,
+          secondSpeechFile,
+          thirdSpeechFile,
+          fourthSpeechFile,
+          fifthSpeechFile,
+        ] = data.speechURLs;
 
         setFirstSpeechDownload(firstSpeechFile);
         setSecondSpeechDownload(secondSpeechFile);
@@ -121,9 +124,6 @@ export default function QuizTemplate() {
         console.log("Third Speech Done", thirdSpeechFile);
         console.log("Fourth Speech Done", fourthSpeechFile);
         console.log("Fifth Speech Done", fifthSpeechFile);
-      },
-      onError: (error) => {
-        console.error("Error Generating Speech:", error);
       },
     });
 
@@ -145,20 +145,37 @@ export default function QuizTemplate() {
 
   const handleGenerateSpeech = (e: React.FormEvent<HTMLElement>) => {
     e.preventDefault();
-    if (!firstQuestionOnly) {
-      setfirstSpeechError("Please generate a quiz first");
-      return; // Early return if prompt is empty
+    // Create an array to hold the questions
+    const questionsArray = [];
+
+    // Push each question into the array if it is not empty
+    if (firstQuestionOnly.trim() !== "") {
+      questionsArray.push(firstQuestionOnly);
     }
+    if (secondQuestionOnly.trim() !== "") {
+      questionsArray.push(secondQuestionOnly);
+    }
+    if (thirdQuestionOnly.trim() !== "") {
+      questionsArray.push(thirdQuestionOnly);
+    }
+    if (fourthQuestionOnly.trim() !== "") {
+      questionsArray.push(fourthQuestionOnly);
+    }
+    if (fifthQuestionOnly.trim() !== "") {
+      questionsArray.push(fifthQuestionOnly);
+    }
+
+    if (questionsArray.length === 0) {
+      setfirstSpeechError("Please generate a quiz first");
+      return; // Early return if no questions are present
+    }
+
     console.log("clicked"); // Log before mutation
 
     try {
       generateTtsSpeech({
-        firstQuestion: firstQuestionOnly,
-        secondQuestion: secondQuestionOnly,
-        thirdQuestion: thirdQuestionOnly,
-        fourthQuestion: fourthQuestionOnly,
-        fifthQuestion: fifthQuestionOnly,
-        speechVoice: voice,
+        questions: questionsArray, // Pass the questionsArray to the mutation
+        speechVoice: voice, // Assuming voice is defined elsewhere
       });
     } catch (error) {
       console.error("Error Generating Quiz:", error);

@@ -155,15 +155,6 @@ export default function QuizTemplate() {
     if (secondQuestionOnly.trim() !== "") {
       questionsArray.push(secondQuestionOnly);
     }
-    if (thirdQuestionOnly.trim() !== "") {
-      questionsArray.push(thirdQuestionOnly);
-    }
-    if (fourthQuestionOnly.trim() !== "") {
-      questionsArray.push(fourthQuestionOnly);
-    }
-    if (fifthQuestionOnly.trim() !== "") {
-      questionsArray.push(fifthQuestionOnly);
-    }
 
     if (questionsArray.length === 0) {
       setfirstSpeechError("Please generate a quiz first");

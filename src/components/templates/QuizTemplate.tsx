@@ -171,16 +171,6 @@ export default function QuizTemplate() {
     } catch (error) {
       console.error("Error Generating First Batch:", error);
     }
-
-    try {
-      generateTtsSpeechSecondBatch({
-        speechVoice: voice,
-        fourthQuestion: fourthQuestionOnly,
-        fifthQuestion: fifthQuestionOnly,
-      });
-    } catch (error) {
-      console.error("Error Generating Second Batch:", error);
-    }
   };
 
   const handleChangePrompt = (e: React.ChangeEvent<HTMLTextAreaElement>) => {

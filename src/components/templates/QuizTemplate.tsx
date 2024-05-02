@@ -110,19 +110,13 @@ export default function QuizTemplate() {
       const firstSpeechFile = data.firstSpeech;
       const secondSpeechFile = data.secondSpeech;
       const thirdSpeechFile = data.thirdSpeech;
-      // const fourthSpeechFile = data.fourthSpeech;
-      // const fifthSpeechFile = data.fifthSpeech;
 
       setFirstSpeechDownload(firstSpeechFile);
       setSecondSpeechDownload(secondSpeechFile);
       setThirdSpeechDownload(thirdSpeechFile);
-      // setFourthSpeechDownload(fourthSpeechFile);
-      // setFifthSpeechDownload(fifthSpeechFile);
       console.log("First Speech Done", firstSpeechFile);
       console.log("Second Speech Done", secondSpeechFile);
       console.log("Third Speech Done", thirdSpeechFile);
-      // console.log("Fourth Speech Done", fourthSpeechFile);
-      // console.log("Fifth Speech Done", fifthSpeechFile);
     },
   });
 
@@ -157,7 +151,7 @@ export default function QuizTemplate() {
     }
   };
 
-  const handleGenerateSpeech = (e: React.FormEvent<HTMLElement>) => {
+  const handleGenerateSpeechFirstBatch = (e: React.FormEvent<HTMLElement>) => {
     e.preventDefault();
     console.log("clicked");
 
@@ -170,6 +164,21 @@ export default function QuizTemplate() {
       });
     } catch (error) {
       console.error("Error Generating First Batch:", error);
+    }
+  };
+
+  const handleGenerateSpeechSecondBatch = (e: React.FormEvent<HTMLElement>) => {
+    e.preventDefault();
+    console.log("clicked");
+
+    try {
+      generateTtsSpeechSecondBatch({
+        speechVoice: voice,
+        fourthQuestion: fourthQuestionOnly,
+        fifthQuestion: fifthQuestionOnly,
+      });
+    } catch (error) {
+      console.error("Error Generating Second Batch:", error);
     }
   };
 
@@ -361,10 +370,7 @@ export default function QuizTemplate() {
               </div>
             </form>
             <div className="font-medium text-2xl">Generate TTS</div>
-            <form
-              onSubmit={handleGenerateSpeech}
-              className="flex flex-col space-y-5"
-            >
+            <div className="flex flex-col space-y-5">
               <div className="relative flex flex-col space-y-7">
                 <div className="relative flex flex-col space-y-3">
                   <label
@@ -497,24 +503,40 @@ export default function QuizTemplate() {
                   </div>
                 </div>
 
-                <Button
-                  type="submit"
-                  disabled={
-                    isSpeechLoadingFirstBatch || isSpeechLoadingSecondBatch
-                  }
-                  variant="destructive"
-                  className={
-                    "bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-600 transition duration-300 ease-in-out"
-                  }
-                >
-                  {isSpeechLoadingFirstBatch || isSpeechLoadingSecondBatch ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    "Generate Text to Speech"
-                  )}
-                </Button>
+                <div className="flex flex-col space-y-3">
+                  <Button
+                    type="submit"
+                    onClick={handleGenerateSpeechFirstBatch}
+                    disabled={isSpeechLoadingFirstBatch}
+                    variant="destructive"
+                    className={
+                      "bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-600 transition duration-300 ease-in-out"
+                    }
+                  >
+                    {isSpeechLoadingFirstBatch ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      "Generate Text to Speech"
+                    )}
+                  </Button>
+                  <Button
+                    type="submit"
+                    onClick={handleGenerateSpeechSecondBatch}
+                    disabled={isSpeechLoadingSecondBatch}
+                    variant="destructive"
+                    className={
+                      "bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-600 transition duration-300 ease-in-out"
+                    }
+                  >
+                    {isSpeechLoadingSecondBatch ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      "Generate Text to Speech"
+                    )}
+                  </Button>
+                </div>
               </div>
-            </form>
+            </div>
             <div className="font-medium text-2xl">Generate Video</div>
             <div className="flex flex-col space-y-5">
               <div className="relative flex flex-col space-y-3">

@@ -102,38 +102,27 @@ export default function QuizTemplate() {
       },
     });
 
-  const {
-    mutate: generateTtsSpeechFirstBatch,
-    isLoading: isSpeechLoadingFirstBatch,
-  } = trpc.generateQuizSpeechFirstBatch.useMutation({
-    onSuccess: async (data) => {
-      const firstSpeechFile = data.firstSpeech;
-      const secondSpeechFile = data.secondSpeech;
-      const thirdSpeechFile = data.thirdSpeech;
+  const { mutate: generateTtsSpeech, isLoading: isSpeechLoading } =
+    trpc.generateQuizSpeech.useMutation({
+      onSuccess: async (data) => {
+        const firstSpeechFile = data.firstSpeech;
+        const secondSpeechFile = data.secondSpeech;
+        const thirdSpeechFile = data.thirdSpeech;
+        const fourthSpeechFile = data.fourthSpeech;
+        const fifthSpeechFile = data.fifthSpeech;
 
-      setFirstSpeechDownload(firstSpeechFile);
-      setSecondSpeechDownload(secondSpeechFile);
-      setThirdSpeechDownload(thirdSpeechFile);
-      console.log("First Speech Done", firstSpeechFile);
-      console.log("Second Speech Done", secondSpeechFile);
-      console.log("Third Speech Done", thirdSpeechFile);
-    },
-  });
-
-  const {
-    mutate: generateTtsSpeechSecondBatch,
-    isLoading: isSpeechLoadingSecondBatch,
-  } = trpc.generateQuizSpeechSecondBatch.useMutation({
-    onSuccess: async (data) => {
-      const fourthSpeechFile = data.fourthSpeech;
-      const fifthSpeechFile = data.fifthSpeech;
-
-      setFourthSpeechDownload(fourthSpeechFile);
-      setFifthSpeechDownload(fifthSpeechFile);
-      console.log("Fourth Speech Done", fourthSpeechFile);
-      console.log("Fifth Speech Done", fifthSpeechFile);
-    },
-  });
+        setFirstSpeechDownload(firstSpeechFile);
+        setSecondSpeechDownload(secondSpeechFile);
+        setThirdSpeechDownload(thirdSpeechFile);
+        setFourthSpeechDownload(fourthSpeechFile);
+        setFifthSpeechDownload(fifthSpeechFile);
+        console.log("First Speech Done", firstSpeechFile);
+        console.log("Second Speech Done", secondSpeechFile);
+        console.log("Third Speech Done", thirdSpeechFile);
+        console.log("Fourth Speech Done", fourthSpeechFile);
+        console.log("Fifth Speech Done", fifthSpeechFile);
+      },
+    });
 
   const handleGenerateQuiz = (e: React.FormEvent<HTMLElement>) => {
     e.preventDefault();
@@ -151,34 +140,22 @@ export default function QuizTemplate() {
     }
   };
 
-  const handleGenerateSpeechFirstBatch = (e: React.FormEvent<HTMLElement>) => {
+  const handleGenerateSpeech = (e: React.FormEvent<HTMLElement>) => {
     e.preventDefault();
+
     console.log("clicked");
 
     try {
-      generateTtsSpeechFirstBatch({
+      generateTtsSpeech({
         speechVoice: voice,
         firstQuestion: firstQuestionOnly,
         secondQuestion: secondQuestionOnly,
         thirdQuestion: thirdQuestionOnly,
-      });
-    } catch (error) {
-      console.error("Error Generating First Batch:", error);
-    }
-  };
-
-  const handleGenerateSpeechSecondBatch = (e: React.FormEvent<HTMLElement>) => {
-    e.preventDefault();
-    console.log("clicked");
-
-    try {
-      generateTtsSpeechSecondBatch({
-        speechVoice: voice,
         fourthQuestion: fourthQuestionOnly,
         fifthQuestion: fifthQuestionOnly,
       });
     } catch (error) {
-      console.error("Error Generating Second Batch:", error);
+      console.error("Error Generating Quiz:", error);
     }
   };
 
@@ -370,7 +347,10 @@ export default function QuizTemplate() {
               </div>
             </form>
             <div className="font-medium text-2xl">Generate TTS</div>
-            <div className="flex flex-col space-y-5">
+            <form
+              onSubmit={handleGenerateSpeech}
+              className="flex flex-col space-y-5"
+            >
               <div className="relative flex flex-col space-y-7">
                 <div className="relative flex flex-col space-y-3">
                   <label
@@ -503,40 +483,22 @@ export default function QuizTemplate() {
                   </div>
                 </div>
 
-                <div className="flex flex-col space-y-3">
-                  <Button
-                    type="submit"
-                    onClick={handleGenerateSpeechFirstBatch}
-                    disabled={isSpeechLoadingFirstBatch}
-                    variant="destructive"
-                    className={
-                      "bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-600 transition duration-300 ease-in-out"
-                    }
-                  >
-                    {isSpeechLoadingFirstBatch ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      "Generate Text to Speech"
-                    )}
-                  </Button>
-                  <Button
-                    type="submit"
-                    onClick={handleGenerateSpeechSecondBatch}
-                    disabled={isSpeechLoadingSecondBatch}
-                    variant="destructive"
-                    className={
-                      "bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-600 transition duration-300 ease-in-out"
-                    }
-                  >
-                    {isSpeechLoadingSecondBatch ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      "Generate Text to Speech"
-                    )}
-                  </Button>
-                </div>
+                <Button
+                  type="submit"
+                  disabled={isSpeechLoading}
+                  variant="destructive"
+                  className={
+                    "bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-600 transition duration-300 ease-in-out"
+                  }
+                >
+                  {isSpeechLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    "Generate Text to Speech"
+                  )}
+                </Button>
               </div>
-            </div>
+            </form>
             <div className="font-medium text-2xl">Generate Video</div>
             <div className="flex flex-col space-y-5">
               <div className="relative flex flex-col space-y-3">
@@ -659,6 +621,7 @@ export default function QuizTemplate() {
               >
                 Transcode File
               </button>
+              <p ref={messageRef}></p>
             </div>
           </div>
         </div>

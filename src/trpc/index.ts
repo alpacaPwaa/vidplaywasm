@@ -390,7 +390,7 @@ export const appRouter = router({
       };
     }),
 
-  generateQuizSpeechFirstBatch: privateProcedure
+  generateQuizSpeech: privateProcedure
     .input(
       z.object({
         speechVoice: z.enum([
@@ -404,6 +404,8 @@ export const appRouter = router({
         firstQuestion: z.string(),
         secondQuestion: z.string(),
         thirdQuestion: z.string(),
+        fourthQuestion: z.string(),
+        fifthQuestion: z.string(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -567,41 +569,6 @@ export const appRouter = router({
           .AWS_BUCKET_NAME!}/${generateThirdFileName()}`
       );
 
-      return {
-        firstSpeech: firstSingedURL.split("?")[0],
-        secondSpeech: secondSingedURL.split("?")[0],
-        thirdSpeech: thirdSingedURL.split("?")[0],
-      };
-    }),
-
-  generateQuizSpeechSecondBatch: privateProcedure
-    .input(
-      z.object({
-        speechVoice: z.enum([
-          "alloy",
-          "echo",
-          "fable",
-          "onyx",
-          "nova",
-          "shimmer",
-        ]),
-        fourthQuestion: z.string(),
-        fifthQuestion: z.string(),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      const openai = new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY,
-      });
-
-      const s3 = new S3Client({
-        region: process.env.AWS_BUCKET_REGION!,
-        credentials: {
-          accessKeyId: process.env.AWS_BUCKET_ACCESS_KEY!,
-          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-        },
-      });
-
       //Fourth Speech
 
       const generateFourthFileName = (bytes = 32) =>
@@ -652,7 +619,7 @@ export const appRouter = router({
           .AWS_BUCKET_NAME!}/${generateFourthFileName()}`
       );
 
-      // Fifth Speech
+      //Fifth Speech
 
       const generateFifthFileName = (bytes = 32) =>
         crypto.randomBytes(bytes).toString("hex");
@@ -703,6 +670,9 @@ export const appRouter = router({
       );
 
       return {
+        firstSpeech: firstSingedURL.split("?")[0],
+        secondSpeech: secondSingedURL.split("?")[0],
+        thirdSpeech: thirdSingedURL.split("?")[0],
         fourthSpeech: fourthSingedURL.split("?")[0],
         fifthSpeech: fifthSingedURL.split("?")[0],
       };

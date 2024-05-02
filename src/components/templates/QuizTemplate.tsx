@@ -102,30 +102,44 @@ export default function QuizTemplate() {
       },
     });
 
-  const { mutate: generateTtsSpeech, isLoading: isSpeechLoading } =
-    trpc.generateQuizSpeech.useMutation({
-      onSuccess: async (data) => {
-        // Assuming data contains an array of speechURLs
-        const [
-          firstSpeechFile,
-          secondSpeechFile,
-          thirdSpeechFile,
-          fourthSpeechFile,
-          fifthSpeechFile,
-        ] = data.speechURLs;
+  const {
+    mutate: generateTtsSpeechFirstBatch,
+    isLoading: isSpeechLoadingFirstBatch,
+  } = trpc.generateQuizSpeechFirstBatch.useMutation({
+    onSuccess: async (data) => {
+      const firstSpeechFile = data.firstSpeech;
+      const secondSpeechFile = data.secondSpeech;
+      const thirdSpeechFile = data.thirdSpeech;
+      // const fourthSpeechFile = data.fourthSpeech;
+      // const fifthSpeechFile = data.fifthSpeech;
 
-        setFirstSpeechDownload(firstSpeechFile);
-        setSecondSpeechDownload(secondSpeechFile);
-        setThirdSpeechDownload(thirdSpeechFile);
-        setFourthSpeechDownload(fourthSpeechFile);
-        setFifthSpeechDownload(fifthSpeechFile);
-        console.log("First Speech Done", firstSpeechFile);
-        console.log("Second Speech Done", secondSpeechFile);
-        console.log("Third Speech Done", thirdSpeechFile);
-        console.log("Fourth Speech Done", fourthSpeechFile);
-        console.log("Fifth Speech Done", fifthSpeechFile);
-      },
-    });
+      setFirstSpeechDownload(firstSpeechFile);
+      setSecondSpeechDownload(secondSpeechFile);
+      setThirdSpeechDownload(thirdSpeechFile);
+      // setFourthSpeechDownload(fourthSpeechFile);
+      // setFifthSpeechDownload(fifthSpeechFile);
+      console.log("First Speech Done", firstSpeechFile);
+      console.log("Second Speech Done", secondSpeechFile);
+      console.log("Third Speech Done", thirdSpeechFile);
+      // console.log("Fourth Speech Done", fourthSpeechFile);
+      // console.log("Fifth Speech Done", fifthSpeechFile);
+    },
+  });
+
+  const {
+    mutate: generateTtsSpeechSecondBatch,
+    isLoading: isSpeechLoadingSecondBatch,
+  } = trpc.generateQuizSpeechSecondBatch.useMutation({
+    onSuccess: async (data) => {
+      const fourthSpeechFile = data.fourthSpeech;
+      const fifthSpeechFile = data.fifthSpeech;
+
+      setFourthSpeechDownload(fourthSpeechFile);
+      setFifthSpeechDownload(fifthSpeechFile);
+      console.log("Fourth Speech Done", fourthSpeechFile);
+      console.log("Fifth Speech Done", fifthSpeechFile);
+    },
+  });
 
   const handleGenerateQuiz = (e: React.FormEvent<HTMLElement>) => {
     e.preventDefault();
@@ -136,7 +150,7 @@ export default function QuizTemplate() {
     console.log("clicked"); // Log before mutation
 
     try {
-      generateQuizScript({ promt: promptText });
+      generateQuizScript({ prompt: promptText });
     } catch (error) {
       console.error("Error Generating Speech:", error);
       // Handle error gracefully, e.g., display an error message to the user
@@ -145,32 +159,27 @@ export default function QuizTemplate() {
 
   const handleGenerateSpeech = (e: React.FormEvent<HTMLElement>) => {
     e.preventDefault();
-    // Create an array to hold the questions
-    const questionsArray = [];
-
-    // Push each question into the array if it is not empty
-    if (firstQuestionOnly.trim() !== "") {
-      questionsArray.push(firstQuestionOnly);
-    }
-    if (secondQuestionOnly.trim() !== "") {
-      questionsArray.push(secondQuestionOnly);
-    }
-
-    if (questionsArray.length === 0) {
-      setfirstSpeechError("Please generate a quiz first");
-      return; // Early return if no questions are present
-    }
-
-    console.log("clicked"); // Log before mutation
+    console.log("clicked");
 
     try {
-      generateTtsSpeech({
-        questions: questionsArray, // Pass the questionsArray to the mutation
-        speechVoice: voice, // Assuming voice is defined elsewhere
+      generateTtsSpeechFirstBatch({
+        speechVoice: voice,
+        firstQuestion: firstQuestionOnly,
+        secondQuestion: secondQuestionOnly,
+        thirdQuestion: thirdQuestionOnly,
       });
     } catch (error) {
-      console.error("Error Generating Quiz:", error);
-      // Handle error gracefully, e.g., display an error message to the user
+      console.error("Error Generating First Batch:", error);
+    }
+
+    try {
+      generateTtsSpeechSecondBatch({
+        speechVoice: voice,
+        fourthQuestion: fourthQuestionOnly,
+        fifthQuestion: fifthQuestionOnly,
+      });
+    } catch (error) {
+      console.error("Error Generating Second Batch:", error);
     }
   };
 
@@ -271,394 +280,374 @@ export default function QuizTemplate() {
       <div className="mx-auto w-full max-w-8xl grow lg:flex">
         {/* Left sidebar */}
         <div className="flex-1 xl:flex">
-          <div className="px-4 py-6 sm:px-6 lg:pl-8 xl:flex-1 xl:pl-6 bg-zinc-50">
-            <Tabs defaultValue="details" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 mb-6">
-                <TabsTrigger value="details">Details</TabsTrigger>
-                <TabsTrigger value="TTS">Text to Speech</TabsTrigger>
-                <TabsTrigger value="video">Video</TabsTrigger>
-              </TabsList>
-              <TabsContent value="details">
-                <form
-                  onSubmit={handleGenerateQuiz}
-                  className="flex flex-col space-y-5"
-                >
-                  <div className="relative flex flex-col space-y-7">
-                    <div className="relative flex flex-col space-y-3">
-                      <label
-                        htmlFor="text-area"
-                        className="text-md font-medium"
-                      >
-                        Enter a topic
-                      </label>
-                      <textarea
-                        id="text-area"
-                        name="prompt"
-                        value={promptText}
-                        onChange={handleChangePrompt}
-                        className={`w-full rounded-md border ${
-                          promtError ? "border-red-500" : "border-gray-300"
-                        } p-2 text-gray-800 bg-zinc-50 focus:border-blue-500 focus:outline-none`}
-                        style={{
-                          borderRadius: "8px",
-                          width: "100%",
-                          height: "100px",
-                        }}
-                        placeholder="Example: Geography Quiz"
-                      />
-                    </div>
+          <div className="px-4 py-6 sm:px-6 lg:pl-8 xl:flex-1 xl:pl-6 bg-zinc-50 max-h-[540px] overflow-y-auto space-y-5">
+            <div className="font-medium text-2xl">Generate Script</div>
+            <form
+              onSubmit={handleGenerateQuiz}
+              className="flex flex-col space-y-5"
+            >
+              <div className="relative flex flex-col space-y-7">
+                <div className="relative flex flex-col space-y-3">
+                  <label htmlFor="text-area" className="text-md font-medium">
+                    Enter a topic
+                  </label>
+                  <textarea
+                    id="text-area"
+                    name="prompt"
+                    value={promptText}
+                    onChange={handleChangePrompt}
+                    className={`w-full rounded-md border ${
+                      promtError ? "border-red-500" : "border-gray-300"
+                    } p-2 text-gray-800 bg-zinc-50 focus:border-blue-500 focus:outline-none`}
+                    style={{
+                      borderRadius: "8px",
+                      width: "100%",
+                      height: "100px",
+                    }}
+                    placeholder="Example: Geography Quiz"
+                  />
+                </div>
 
-                    <div className="relative flex flex-col space-y-3">
-                      <label
-                        htmlFor="template-videos"
-                        className="text-md font-medium"
-                      >
-                        Script
-                      </label>
-                      <div
-                        id="template-videos"
-                        className="relative flex flex-col space-y-3 max-h-[170px] overflow-y-auto border border-gray-300 rounded-md p-3"
-                      >
-                        {firstQuestion ? (
-                          <>
-                            <div className="relative flex flex-col space-y-3">
-                              <div className="whitespace-pre">
-                                {firstQuestion}
-                              </div>
-                              <div>Answer: {firstAnswer}</div>
-                            </div>
-                            <div className="relative flex flex-col space-y-3">
-                              <div className="whitespace-pre">
-                                {secondQuestion}
-                              </div>
-                              <div>Answer: {secondAnswer}</div>
-                            </div>
-                            <div className="relative flex flex-col space-y-3">
-                              <div className="whitespace-pre">
-                                {thirdQuestion}
-                              </div>
-                              <div>Answer: {thirdAnswer}</div>
-                            </div>
-                            <div className="relative flex flex-col space-y-3">
-                              <div className="whitespace-pre">
-                                {fourthQuestion}
-                              </div>
-                              <div>Answer: {fourthAnswer}</div>
-                            </div>
-                            <div className="relative flex flex-col space-y-3">
-                              <div className="whitespace-pre">
-                                {fifthQuestion}
-                              </div>
-                              <div>Answer: {fifthAnswer}</div>
-                            </div>
-                          </>
-                        ) : (
-                          <div className="flex flex-col items-center gap-2 p-4">
-                            <Ghost className="h-8 w-8 text-zinc-800" />
-                            <h3 className="font-semibold text-lg">
-                              Pretty empty around here
-                            </h3>
-                            <p>Let&apos;s generate you first quiz.</p>
-                          </div>
-                        )}
+                <div className="relative flex flex-col space-y-3">
+                  <label
+                    htmlFor="template-videos"
+                    className="text-md font-medium"
+                  >
+                    Script
+                  </label>
+                  <div
+                    id="template-videos"
+                    className="relative flex flex-col space-y-3 max-h-[170px] overflow-y-auto border border-gray-300 rounded-md p-3"
+                  >
+                    {firstQuestion ? (
+                      <>
+                        <div className="relative flex flex-col space-y-3">
+                          <div className="whitespace-pre">{firstQuestion}</div>
+                          <div>Answer: {firstAnswer}</div>
+                        </div>
+                        <div className="relative flex flex-col space-y-3">
+                          <div className="whitespace-pre">{secondQuestion}</div>
+                          <div>Answer: {secondAnswer}</div>
+                        </div>
+                        <div className="relative flex flex-col space-y-3">
+                          <div className="whitespace-pre">{thirdQuestion}</div>
+                          <div>Answer: {thirdAnswer}</div>
+                        </div>
+                        <div className="relative flex flex-col space-y-3">
+                          <div className="whitespace-pre">{fourthQuestion}</div>
+                          <div>Answer: {fourthAnswer}</div>
+                        </div>
+                        <div className="relative flex flex-col space-y-3">
+                          <div className="whitespace-pre">{fifthQuestion}</div>
+                          <div>Answer: {fifthAnswer}</div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="flex flex-col items-center gap-2">
+                        <Ghost className="h-8 w-8 text-zinc-800" />
+                        <h3 className="font-semibold text-lg">
+                          Pretty empty around here
+                        </h3>
+                        <p>Let&apos;s generate you first quiz.</p>
                       </div>
-                    </div>
-
-                    <Button
-                      type="submit"
-                      disabled={isQuizScriptLoading}
-                      variant="destructive"
-                      className={
-                        "bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-600 transition duration-300 ease-in-out"
-                      }
-                    >
-                      {isQuizScriptLoading ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        "Generate Quiz"
-                      )}
-                    </Button>
+                    )}
                   </div>
-                </form>
-              </TabsContent>
+                </div>
 
-              <TabsContent value="TTS">
-                <form
-                  onSubmit={handleGenerateSpeech}
-                  className="flex flex-col space-y-5"
+                <Button
+                  type="submit"
+                  disabled={isQuizScriptLoading}
+                  variant="destructive"
+                  className={
+                    "bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-600 transition duration-300 ease-in-out"
+                  }
                 >
-                  <div className="relative flex flex-col space-y-7">
-                    <div className="relative flex flex-col space-y-3">
-                      <label
-                        htmlFor="template-videos"
-                        className="text-md font-medium"
-                      >
-                        Select a Voice
-                      </label>
-                      <div
-                        id="template-videos"
-                        className="relative flex flex-col space-y-3 max-h-[110px] overflow-y-auto border border-gray-300 rounded-md p-3"
-                      >
-                        <div
-                          className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
-                            voice === "alloy"
-                              ? "border-blue-500"
-                              : "border-gray-300"
-                          }`}
-                          onClick={() => setVoice("alloy")}
-                        >
-                          <div className="h-full flex font-medium text-md">
-                            Alloy
-                          </div>
-                        </div>
-                        <div
-                          className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
-                            voice === "echo"
-                              ? "border-blue-500"
-                              : "border-gray-300"
-                          }`}
-                          onClick={() => setVoice("echo")}
-                        >
-                          <div className="h-full flex font-medium text-md">
-                            Echo
-                          </div>
-                        </div>
-                        <div
-                          className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
-                            voice === "fable"
-                              ? "border-blue-500"
-                              : "border-gray-300"
-                          }`}
-                          onClick={() => setVoice("fable")}
-                        >
-                          <div className="h-full flex font-medium text-md">
-                            Fable
-                          </div>
-                        </div>
-                        <div
-                          className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
-                            voice === "onyx"
-                              ? "border-blue-500"
-                              : "border-gray-300"
-                          }`}
-                          onClick={() => setVoice("onyx")}
-                        >
-                          <div className="h-full flex font-medium text-md">
-                            Onyx
-                          </div>
-                        </div>
-                        <div
-                          className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
-                            voice === "nova"
-                              ? "border-blue-500"
-                              : "border-gray-300"
-                          }`}
-                          onClick={() => setVoice("nova")}
-                        >
-                          <div className="h-full flex font-medium text-md">
-                            Nova
-                          </div>
-                        </div>
-                        <div
-                          className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
-                            voice === "shimmer"
-                              ? "border-blue-500"
-                              : "border-gray-300"
-                          }`}
-                          onClick={() => setVoice("shimmer")}
-                        >
-                          <div className="h-full flex font-medium text-md">
-                            Shimmer
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="relative flex flex-col space-y-3">
-                      <label
-                        htmlFor="text-to-speech"
-                        className="text-md font-medium"
-                      >
-                        Text to Speech
-                      </label>
-                      <div
-                        id="text-to-speech"
-                        className="relative flex flex-col space-y-3 max-h-[170px] overflow-y-auto border border-gray-300 rounded-md p-3"
-                      >
-                        {firstSpeechDownload ? (
-                          <div className="relative flex flex-col space-y-3">
-                            <audio
-                              src={firstSpeechDownload}
-                              className="flex w-full"
-                              controls
-                            />
-                            <audio
-                              src={secondSpeechDownload}
-                              className="flex w-full"
-                              controls
-                            />
-                            <audio
-                              src={thirdSpeechDownload}
-                              className="flex w-full"
-                              controls
-                            />
-                            <audio
-                              src={fourthSpeechDownload}
-                              className="flex w-full"
-                              controls
-                            />
-                            <audio
-                              src={fifthSpeechDownload}
-                              className="flex w-full"
-                              controls
-                            />
-                          </div>
-                        ) : (
-                          <div className="flex flex-col items-center gap-2 p-4">
-                            <Ghost className="h-8 w-8 text-zinc-800" />
-                            <h3 className="font-semibold text-lg">
-                              Pretty empty around here
-                            </h3>
-                            <p>Let&apos;s generate your TTS.</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    <Button
-                      type="submit"
-                      disabled={isSpeechLoading}
-                      variant="destructive"
-                      className={
-                        "bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-600 transition duration-300 ease-in-out"
-                      }
-                    >
-                      {isSpeechLoading ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        "Generate Text to Speech"
-                      )}
-                    </Button>
-                  </div>
-                </form>
-              </TabsContent>
-
-              <TabsContent value="video">
-                <div className="flex flex-col space-y-5">
-                  <div className="relative flex flex-col space-y-3">
-                    <label
-                      htmlFor="template-videos"
-                      className="text-md font-medium"
-                    >
-                      Select a background video
-                    </label>
+                  {isQuizScriptLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    "Generate Quiz"
+                  )}
+                </Button>
+              </div>
+            </form>
+            <div className="font-medium text-2xl">Generate TTS</div>
+            <form
+              onSubmit={handleGenerateSpeech}
+              className="flex flex-col space-y-5"
+            >
+              <div className="relative flex flex-col space-y-7">
+                <div className="relative flex flex-col space-y-3">
+                  <label
+                    htmlFor="template-videos"
+                    className="text-md font-medium"
+                  >
+                    Select a Voice
+                  </label>
+                  <div
+                    id="template-videos"
+                    className="relative flex flex-col space-y-3 max-h-[120px] overflow-y-auto border border-gray-300 rounded-md p-3"
+                  >
                     <div
-                      id="template-videos"
-                      className="relative flex flex-col space-y-3 max-h-[170px] overflow-y-auto border border-gray-300 rounded-md p-3"
+                      className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
+                        voice === "alloy"
+                          ? "border-blue-500"
+                          : "border-gray-300"
+                      }`}
+                      onClick={() => setVoice("alloy")}
                     >
-                      <div
-                        className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
-                          videoFile === "/templates/template1/video1.mp4"
-                            ? "border-blue-500"
-                            : "border-gray-300"
-                        }`}
-                        onClick={() =>
-                          setVideoFile("/templates/template1/video1.mp4")
-                        }
-                      >
-                        <div className="template-video bg-gray-200 rounded-sm">
-                          <video
-                            src="/templates/template1/video1.mp4"
-                            className="w-20 h-12 p-1"
-                          ></video>
-                        </div>
-                        <div className="template-info text-center flex-grow pl-4">
-                          <div className="h-full flex font-medium text-md">
-                            Video 1
-                          </div>
-                        </div>
+                      <div className="h-full flex font-medium text-md">
+                        Alloy
                       </div>
-                      <div
-                        className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
-                          videoFile === "/templates/template1/video2.mp4"
-                            ? "border-blue-500"
-                            : "border-gray-300"
-                        }`}
-                        onClick={() =>
-                          setVideoFile("/templates/template1/video2.mp4")
-                        }
-                      >
-                        <div className="template-video bg-gray-200 rounded-sm">
-                          <video
-                            src="/templates/template1/video2.mp4"
-                            className="w-20 h-12 p-1"
-                          ></video>
-                        </div>
-                        <div className="template-info text-center flex-grow pl-3">
-                          <div className="h-full flex font-medium text-md">
-                            Video 2
-                          </div>
-                        </div>
+                    </div>
+                    <div
+                      className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
+                        voice === "echo" ? "border-blue-500" : "border-gray-300"
+                      }`}
+                      onClick={() => setVoice("echo")}
+                    >
+                      <div className="h-full flex font-medium text-md">
+                        Echo
                       </div>
-                      <div
-                        className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
-                          videoFile === "/templates/template1/video3.mp4"
-                            ? "border-blue-500"
-                            : "border-gray-300"
-                        }`}
-                        onClick={() =>
-                          setVideoFile("/templates/template1/video3.mp4")
-                        }
-                      >
-                        <div className="template-video bg-gray-200 rounded-sm">
-                          <video
-                            src="/templates/template1/video3.mp4"
-                            className="w-20 h-12 p-1"
-                          ></video>
-                        </div>
-                        <div className="template-info text-center flex-grow pl-3">
-                          <div className="h-full flex font-medium text-md">
-                            Video 3
-                          </div>
-                        </div>
+                    </div>
+                    <div
+                      className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
+                        voice === "fable"
+                          ? "border-blue-500"
+                          : "border-gray-300"
+                      }`}
+                      onClick={() => setVoice("fable")}
+                    >
+                      <div className="h-full flex font-medium text-md">
+                        Fable
                       </div>
-                      <div
-                        className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
-                          videoFile === "/templates/template1/video4.mp4"
-                            ? "border-blue-500"
-                            : "border-gray-300"
-                        }`}
-                        onClick={() =>
-                          setVideoFile("/templates/template1/video4.mp4")
-                        }
-                      >
-                        <div className="template-video bg-gray-200 rounded-sm">
-                          <video
-                            src="/templates/template1/video4.mp4"
-                            className="w-20 h-12 p-1"
-                          ></video>
-                        </div>
-                        <div className="template-info text-center flex-grow pl-3">
-                          <div className="h-full flex font-medium text-md">
-                            Video 4
-                          </div>
-                        </div>
+                    </div>
+                    <div
+                      className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
+                        voice === "onyx" ? "border-blue-500" : "border-gray-300"
+                      }`}
+                      onClick={() => setVoice("onyx")}
+                    >
+                      <div className="h-full flex font-medium text-md">
+                        Onyx
+                      </div>
+                    </div>
+                    <div
+                      className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
+                        voice === "nova" ? "border-blue-500" : "border-gray-300"
+                      }`}
+                      onClick={() => setVoice("nova")}
+                    >
+                      <div className="h-full flex font-medium text-md">
+                        Nova
+                      </div>
+                    </div>
+                    <div
+                      className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
+                        voice === "shimmer"
+                          ? "border-blue-500"
+                          : "border-gray-300"
+                      }`}
+                      onClick={() => setVoice("shimmer")}
+                    >
+                      <div className="h-full flex font-medium text-md">
+                        Shimmer
                       </div>
                     </div>
                   </div>
+                </div>
 
-                  <button
-                    onClick={transcode}
-                    className={
-                      "bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-600 transition duration-300 ease-in-out"
+                <div className="relative flex flex-col space-y-3">
+                  <label
+                    htmlFor="text-to-speech"
+                    className="text-md font-medium"
+                  >
+                    Text to Speech
+                  </label>
+                  <div
+                    id="text-to-speech"
+                    className="relative flex flex-col space-y-3 max-h-[170px] overflow-y-auto border border-gray-300 rounded-md p-3"
+                  >
+                    {firstSpeechDownload ? (
+                      <div className="relative flex flex-col space-y-3">
+                        <audio
+                          src={firstSpeechDownload}
+                          className="flex w-full"
+                          controls
+                        />
+                        <audio
+                          src={secondSpeechDownload}
+                          className="flex w-full"
+                          controls
+                        />
+                        <audio
+                          src={thirdSpeechDownload}
+                          className="flex w-full"
+                          controls
+                        />
+                        <audio
+                          src={fourthSpeechDownload}
+                          className="flex w-full"
+                          controls
+                        />
+                        <audio
+                          src={fifthSpeechDownload}
+                          className="flex w-full"
+                          controls
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-2">
+                        <Ghost className="h-8 w-8 text-zinc-800" />
+                        <h3 className="font-semibold text-lg">
+                          Pretty empty around here
+                        </h3>
+                        <p>Let&apos;s generate your TTS.</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={
+                    isSpeechLoadingFirstBatch || isSpeechLoadingSecondBatch
+                  }
+                  variant="destructive"
+                  className={
+                    "bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-600 transition duration-300 ease-in-out"
+                  }
+                >
+                  {isSpeechLoadingFirstBatch || isSpeechLoadingSecondBatch ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    "Generate Text to Speech"
+                  )}
+                </Button>
+              </div>
+            </form>
+            <div className="font-medium text-2xl">Generate Video</div>
+            <div className="flex flex-col space-y-5">
+              <div className="relative flex flex-col space-y-3">
+                <label
+                  htmlFor="template-videos"
+                  className="text-md font-medium"
+                >
+                  Select a background video
+                </label>
+                <div
+                  id="template-videos"
+                  className="relative flex flex-col space-y-3 max-h-[170px] overflow-y-auto border border-gray-300 rounded-md p-3"
+                >
+                  <div
+                    className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
+                      videoFile === "/templates/template1/video1.mp4"
+                        ? "border-blue-500"
+                        : "border-gray-300"
+                    }`}
+                    onClick={() =>
+                      setVideoFile("/templates/template1/video1.mp4")
                     }
                   >
-                    Transcode File
-                  </button>
+                    <div className="template-video bg-gray-200 rounded-sm">
+                      <video
+                        src="/templates/template1/video1.mp4"
+                        className="w-20 h-12 p-1"
+                      ></video>
+                    </div>
+                    <div className="template-info text-center flex-grow pl-4">
+                      <div className="h-full flex font-medium text-md">
+                        Video 1
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
+                      videoFile === "/templates/template1/video2.mp4"
+                        ? "border-blue-500"
+                        : "border-gray-300"
+                    }`}
+                    onClick={() =>
+                      setVideoFile("/templates/template1/video2.mp4")
+                    }
+                  >
+                    <div className="template-video bg-gray-200 rounded-sm">
+                      <video
+                        src="/templates/template1/video2.mp4"
+                        className="w-20 h-12 p-1"
+                      ></video>
+                    </div>
+                    <div className="template-info text-center flex-grow pl-3">
+                      <div className="h-full flex font-medium text-md">
+                        Video 2
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
+                      videoFile === "/templates/template1/video3.mp4"
+                        ? "border-blue-500"
+                        : "border-gray-300"
+                    }`}
+                    onClick={() =>
+                      setVideoFile("/templates/template1/video3.mp4")
+                    }
+                  >
+                    <div className="template-video bg-gray-200 rounded-sm">
+                      <video
+                        src="/templates/template1/video3.mp4"
+                        className="w-20 h-12 p-1"
+                      ></video>
+                    </div>
+                    <div className="template-info text-center flex-grow pl-3">
+                      <div className="h-full flex font-medium text-md">
+                        Video 3
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
+                      videoFile === "/templates/template1/video4.mp4"
+                        ? "border-blue-500"
+                        : "border-gray-300"
+                    }`}
+                    onClick={() =>
+                      setVideoFile("/templates/template1/video4.mp4")
+                    }
+                  >
+                    <div className="template-video bg-gray-200 rounded-sm">
+                      <video
+                        src="/templates/template1/video4.mp4"
+                        className="w-20 h-12 p-1"
+                      ></video>
+                    </div>
+                    <div className="template-info text-center flex-grow pl-3">
+                      <div className="h-full flex font-medium text-md">
+                        Video 4
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <label htmlFor="video-status" className="text-md font-medium">
+                  Video Status
+                </label>
+                <div
+                  id="video-status"
+                  className="relative flex flex-col space-y-3 overflow-y-auto border border-gray-300 rounded-md p-3  w-full h-28"
+                >
                   <p ref={messageRef}></p>
                 </div>
-              </TabsContent>
-            </Tabs>
+              </div>
+
+              <button
+                onClick={transcode}
+                className={
+                  "bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-600 transition duration-300 ease-in-out"
+                }
+              >
+                Transcode File
+              </button>
+            </div>
           </div>
         </div>
 

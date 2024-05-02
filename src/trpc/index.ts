@@ -39,7 +39,7 @@ export const appRouter = router({
   generateQuizScript: privateProcedure
     .input(
       z.object({
-        promt: z.string(),
+        prompt: z.string(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -54,7 +54,7 @@ export const appRouter = router({
         model: "gpt-3.5-turbo-instruct",
         prompt:
           "Write 1 general knowledge quiz with 4 choices and answer about " +
-          input.promt +
+          input.prompt +
           " Always start with keyword Question:, example Question: question. Then the choices, A, B, C, and D. Lastly, the correct answer which always must begin with the keyword Answer:, then the correct answer, example: Answer. A. Correct Answer",
         temperature: 1,
         max_tokens: 256,
@@ -390,7 +390,7 @@ export const appRouter = router({
       };
     }),
 
-  generateQuizSpeech: privateProcedure
+  generateQuizSpeechFirstBatch: privateProcedure
     .input(
       z.object({
         speechVoice: z.enum([
@@ -401,7 +401,9 @@ export const appRouter = router({
           "nova",
           "shimmer",
         ]),
-        questions: z.array(z.string()), // Array of questions
+        firstQuestion: z.string(),
+        secondQuestion: z.string(),
+        thirdQuestion: z.string(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -417,61 +419,293 @@ export const appRouter = router({
         },
       });
 
-      const generateFileName = (bytes = 32) =>
+      const generateFirstFileName = (bytes = 32) =>
         crypto.randomBytes(bytes).toString("hex");
 
-      const uploadSpeechToS3 = async (
-        question: string,
-        questionNumber: number
-      ) => {
-        const speechURL = generateFileName();
-        const putObjectCommand = new PutObjectCommand({
-          Bucket: process.env.AWS_BUCKET_NAME!,
-          Key: speechURL,
-        });
-        const signedURL = await getSignedUrl(s3, putObjectCommand, {
-          expiresIn: 60,
-        });
+      const firstSpeechURL = generateFirstFileName();
 
-        const questionSpeech = await openai.audio.speech.create({
-          model: "tts-1",
-          voice: input.speechVoice,
-          input: question,
-        });
+      const putFirstObjectCommand = new PutObjectCommand({
+        Bucket: process.env.AWS_BUCKET_NAME!,
+        Key: firstSpeechURL,
+      });
 
-        const questionBuffer = Buffer.from(await questionSpeech.arrayBuffer());
+      const firstSingedURL = await getSignedUrl(s3, putFirstObjectCommand, {
+        expiresIn: 60,
+      });
 
-        const passThroughStream = new PassThrough();
-        passThroughStream.write(questionBuffer);
-        passThroughStream.end();
+      const firstQuestionSpeech = await openai.audio.speech.create({
+        model: "tts-1",
+        voice: input.speechVoice,
+        input: input.firstQuestion,
+      });
 
+      const firstQuestionBuffer = Buffer.from(
+        await firstQuestionSpeech.arrayBuffer()
+      );
+
+      const uploadFirstSpeechToS3 = async (stream: PassThrough) => {
         const upload = new Upload({
           client: s3,
           params: {
             Bucket: process.env.AWS_BUCKET_NAME!,
-            Key: speechURL,
-            Body: passThroughStream,
+            Key: firstSpeechURL,
+            Body: stream,
             ContentType: "audio/mpeg",
           },
         });
         await upload.done();
-
-        console.log(
-          `Uploaded TTS audio to S3: s3://${process.env
-            .AWS_BUCKET_NAME!}/${speechURL}`
-        );
-
-        return signedURL.split("?")[0];
       };
 
-      const speechURLs = [];
-      for (let i = 0; i < input.questions.length; i++) {
-        const question = input.questions[i];
-        const speechURL = await uploadSpeechToS3(question, i + 1);
-        speechURLs.push(speechURL);
-      }
+      const passThroughStreamFirstSpeeh = new PassThrough();
+      passThroughStreamFirstSpeeh.write(firstQuestionBuffer);
+      passThroughStreamFirstSpeeh.end();
 
-      return { speechURLs };
+      await uploadFirstSpeechToS3(passThroughStreamFirstSpeeh);
+
+      console.log(
+        `Uploaded TTS audio to S3: s3://${process.env
+          .AWS_BUCKET_NAME!}/${generateFirstFileName()}`
+      );
+
+      //Second Speech
+
+      const generateSecondFileName = (bytes = 32) =>
+        crypto.randomBytes(bytes).toString("hex");
+
+      const secondSpeechURL = generateSecondFileName();
+
+      const putSecondObjectCommand = new PutObjectCommand({
+        Bucket: process.env.AWS_BUCKET_NAME!,
+        Key: secondSpeechURL,
+      });
+
+      const secondSingedURL = await getSignedUrl(s3, putSecondObjectCommand, {
+        expiresIn: 60,
+      });
+
+      const secondQuestionSpeech = await openai.audio.speech.create({
+        model: "tts-1",
+        voice: input.speechVoice,
+        input: input.secondQuestion,
+      });
+
+      const secondQuestionBuffer = Buffer.from(
+        await secondQuestionSpeech.arrayBuffer()
+      );
+
+      const uploadSecondSpeechToS3 = async (stream: PassThrough) => {
+        const upload = new Upload({
+          client: s3,
+          params: {
+            Bucket: process.env.AWS_BUCKET_NAME!,
+            Key: secondSpeechURL,
+            Body: stream,
+            ContentType: "audio/mpeg",
+          },
+        });
+        await upload.done();
+      };
+
+      const passThroughStreamSecondSpeeh = new PassThrough();
+      passThroughStreamSecondSpeeh.write(secondQuestionBuffer);
+      passThroughStreamSecondSpeeh.end();
+
+      await uploadSecondSpeechToS3(passThroughStreamSecondSpeeh);
+
+      console.log(
+        `Uploaded TTS audio to S3: s3://${process.env
+          .AWS_BUCKET_NAME!}/${generateSecondFileName()}`
+      );
+
+      //Third Speech
+
+      const generateThirdFileName = (bytes = 32) =>
+        crypto.randomBytes(bytes).toString("hex");
+
+      const thirdSpeechURL = generateThirdFileName();
+
+      const putThirdObjectCommand = new PutObjectCommand({
+        Bucket: process.env.AWS_BUCKET_NAME!,
+        Key: thirdSpeechURL,
+      });
+
+      const thirdSingedURL = await getSignedUrl(s3, putThirdObjectCommand, {
+        expiresIn: 60,
+      });
+
+      const thirdQuestionSpeech = await openai.audio.speech.create({
+        model: "tts-1",
+        voice: input.speechVoice,
+        input: input.thirdQuestion,
+      });
+
+      const thirdQuestionBuffer = Buffer.from(
+        await thirdQuestionSpeech.arrayBuffer()
+      );
+
+      const uploadThirdSpeechToS3 = async (stream: PassThrough) => {
+        const upload = new Upload({
+          client: s3,
+          params: {
+            Bucket: process.env.AWS_BUCKET_NAME!,
+            Key: thirdSpeechURL,
+            Body: stream,
+            ContentType: "audio/mpeg",
+          },
+        });
+        await upload.done();
+      };
+
+      const passThroughStreamThirdSpeech = new PassThrough();
+      passThroughStreamThirdSpeech.write(thirdQuestionBuffer);
+      passThroughStreamThirdSpeech.end();
+
+      await uploadThirdSpeechToS3(passThroughStreamThirdSpeech);
+
+      console.log(
+        `Uploaded TTS audio to S3: s3://${process.env
+          .AWS_BUCKET_NAME!}/${generateThirdFileName()}`
+      );
+
+      return {
+        firstSpeech: firstSingedURL.split("?")[0],
+        secondSpeech: secondSingedURL.split("?")[0],
+        thirdSpeech: thirdSingedURL.split("?")[0],
+      };
+    }),
+
+  generateQuizSpeechSecondBatch: privateProcedure
+    .input(
+      z.object({
+        speechVoice: z.enum([
+          "alloy",
+          "echo",
+          "fable",
+          "onyx",
+          "nova",
+          "shimmer",
+        ]),
+        fourthQuestion: z.string(),
+        fifthQuestion: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const openai = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+      });
+
+      const s3 = new S3Client({
+        region: process.env.AWS_BUCKET_REGION!,
+        credentials: {
+          accessKeyId: process.env.AWS_BUCKET_ACCESS_KEY!,
+          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+        },
+      });
+
+      //Fourth Speech
+
+      const generateFourthFileName = (bytes = 32) =>
+        crypto.randomBytes(bytes).toString("hex");
+
+      const fourthSpeechURL = generateFourthFileName();
+
+      const putFourthObjectCommand = new PutObjectCommand({
+        Bucket: process.env.AWS_BUCKET_NAME!,
+        Key: fourthSpeechURL,
+      });
+
+      const fourthSingedURL = await getSignedUrl(s3, putFourthObjectCommand, {
+        expiresIn: 60,
+      });
+
+      const fourthQuestionSpeech = await openai.audio.speech.create({
+        model: "tts-1",
+        voice: input.speechVoice,
+        input: input.fourthQuestion,
+      });
+
+      const fourthQuestionBuffer = Buffer.from(
+        await fourthQuestionSpeech.arrayBuffer()
+      );
+
+      const uploadFourthSpeechToS3 = async (stream: PassThrough) => {
+        const upload = new Upload({
+          client: s3,
+          params: {
+            Bucket: process.env.AWS_BUCKET_NAME!,
+            Key: fourthSpeechURL,
+            Body: stream,
+            ContentType: "audio/mpeg",
+          },
+        });
+        await upload.done();
+      };
+
+      const passThroughStreamFourthSpeech = new PassThrough();
+      passThroughStreamFourthSpeech.write(fourthQuestionBuffer);
+      passThroughStreamFourthSpeech.end();
+
+      await uploadFourthSpeechToS3(passThroughStreamFourthSpeech);
+
+      console.log(
+        `Uploaded TTS audio to S3: s3://${process.env
+          .AWS_BUCKET_NAME!}/${generateFourthFileName()}`
+      );
+
+      // Fifth Speech
+
+      const generateFifthFileName = (bytes = 32) =>
+        crypto.randomBytes(bytes).toString("hex");
+
+      const fifthSpeechURL = generateFifthFileName();
+
+      const putFifthObjectCommand = new PutObjectCommand({
+        Bucket: process.env.AWS_BUCKET_NAME!,
+        Key: fifthSpeechURL,
+      });
+
+      const fifthSingedURL = await getSignedUrl(s3, putFifthObjectCommand, {
+        expiresIn: 60,
+      });
+
+      const fifthQuestionSpeech = await openai.audio.speech.create({
+        model: "tts-1",
+        voice: input.speechVoice,
+        input: input.fifthQuestion,
+      });
+
+      const fifthQuestionBuffer = Buffer.from(
+        await fifthQuestionSpeech.arrayBuffer()
+      );
+
+      const uploadFifthSpeechToS3 = async (stream: PassThrough) => {
+        const upload = new Upload({
+          client: s3,
+          params: {
+            Bucket: process.env.AWS_BUCKET_NAME!,
+            Key: fifthSpeechURL,
+            Body: stream,
+            ContentType: "audio/mpeg",
+          },
+        });
+        await upload.done();
+      };
+
+      const passThroughStreamFifthSpeech = new PassThrough();
+      passThroughStreamFifthSpeech.write(fifthQuestionBuffer);
+      passThroughStreamFifthSpeech.end();
+
+      await uploadFifthSpeechToS3(passThroughStreamFifthSpeech);
+
+      console.log(
+        `Uploaded TTS audio to S3: s3://${process.env
+          .AWS_BUCKET_NAME!}/${generateFifthFileName()}`
+      );
+
+      return {
+        fourthSpeech: fourthSingedURL.split("?")[0],
+        fifthSpeech: fifthSingedURL.split("?")[0],
+      };
     }),
 });
 

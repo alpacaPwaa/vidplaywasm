@@ -197,28 +197,28 @@ export default function QuizTemplate() {
       )
     );
 
-    const fixedQuestionY = 500;
+    const fixedQuestionX = 1700;
 
     // Command for adding text overlay and speech file to the input video
     await ffmpeg.exec([
       "-i",
       "input.mp4",
       "-vf",
-      `drawtext=fontfile=/Roboto-Regular.ttf:text='${firstQuestion}':x=(w-text_w)/2:y=${fixedQuestionY}/2:fontsize=55:fontcolor=white:enable='between(t,5,13)',
-      drawtext=fontfile=/Roboto-Regular.ttf:text='${firstChoices}':x=(w-text_w)/2:y=(2*h/3+text_h*3)/2:fontsize=55:fontcolor=white:enable='between(t,5,13)',
-      drawtext=fontfile=/Roboto-Regular.ttf:text='${firstAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=55:fontcolor=white:enable='between(t,13,15)',
-      drawtext=fontfile=/Roboto-Regular.ttf:text='${secondQuestion}':x=(w-text_w)/2:y=${fixedQuestionY}/2:fontsize=55:fontcolor=white:enable='between(t,15,23)',
-      drawtext=fontfile=/Roboto-Regular.ttf:text='${secondChoices}':x=(w-text_w)/2:y=(2*h/3+text_h*3)/2:fontsize=55:fontcolor=white:enable='between(t,15,23)',
-      drawtext=fontfile=/Roboto-Regular.ttf:text='${secondAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=55:fontcolor=white:enable='between(t,23,25)',
-      drawtext=fontfile=/Roboto-Regular.ttf:text='${thirdQuestion}':x=(w-text_w)/2:y=${fixedQuestionY}/2:fontsize=55:fontcolor=white:enable='between(t,25,33)',
-      drawtext=fontfile=/Roboto-Regular.ttf:text='${thirdChoices}':x=(w-text_w)/2:y=(2*h/3+text_h*3)/2:fontsize=55:fontcolor=white:enable='between(t,25,33)',
-      drawtext=fontfile=/Roboto-Regular.ttf:text='${thirdAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=55:fontcolor=white:enable='between(t,33,35)',
-      drawtext=fontfile=/Roboto-Regular.ttf:text='${fourthQuestion}':x=(w-text_w)/2:y=${fixedQuestionY}/2:fontsize=55:fontcolor=white:enable='between(t,35,43)',
-      drawtext=fontfile=/Roboto-Regular.ttf:text='${fourthChoices}':x=(w-text_w)/2:y=(2*h/3+text_h*3)/2:fontsize=55:fontcolor=white:enable='between(t,35,43)',
-      drawtext=fontfile=/Roboto-Regular.ttf:text='${fourthAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=55:fontcolor=white:enable='between(t,43,45)',
-      drawtext=fontfile=/Roboto-Regular.ttf:text='${fifthQuestion}':x=(w-text_w)/2:y=${fixedQuestionY}/2:fontsize=55:fontcolor=white:enable='between(t,45,53)',
-      drawtext=fontfile=/Roboto-Regular.ttf:text='${fifthChoices}':x=(w-text_w)/2:y=(2*h/3+text_h*3)/2:fontsize=55:fontcolor=white:enable='between(t,45,53)',
-      drawtext=fontfile=/Roboto-Regular.ttf:text='${fifthAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=55:fontcolor=white:enable='between(t,53,55)'`,
+      `drawtext=fontfile=/Roboto-Regular.ttf:text='${firstQuestion}':x=(w-text_w)/2:y=(h-text_h)/4:fontsize=60:fontcolor=white:line_spacing=20:enable='between(t,5,13)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${firstChoices}':x=(w-text_w)/2:y=${fixedQuestionX}/2:fontsize=60:fontcolor=white:line_spacing=130:enable='between(t,5,13)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${firstAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=60:fontcolor=white:line_spacing=20:enable='between(t,13,15)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${secondQuestion}':x=(w-text_w)/2:y=(h-text_h)/4:fontsize=60:fontcolor=white:line_spacing=20:enable='between(t,15,23)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${secondChoices}':x=(w-text_w)/2:y=${fixedQuestionX}/2:fontsize=60:fontcolor=white:line_spacing=130:enable='between(t,15,23)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${secondAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=60:fontcolor=white:line_spacing=20:enable='between(t,23,25)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${thirdQuestion}':x=(w-text_w)/2:y=(h-text_h)/4:fontsize=60:fontcolor=white:line_spacing=20:enable='between(t,25,33)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${thirdChoices}':x=(w-text_w)/2:y=${fixedQuestionX}/2:fontsize=60:fontcolor=white:line_spacing=130:enable='between(t,25,33)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${thirdAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=60:fontcolor=white:line_spacing=20:enable='between(t,33,35)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${fourthQuestion}':x=(w-text_w)/2:y=(h-text_h)/4:fontsize=60:fontcolor=white:line_spacing=20:enable='between(t,35,43)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${fourthChoices}':x=(w-text_w)/2:y=${fixedQuestionX}/2:fontsize=60:fontcolor=white:line_spacing=130:enable='between(t,35,43)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${fourthAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=60:fontcolor=white:line_spacing=20:enable='between(t,43,45)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${fifthQuestion}':x=(w-text_w)/2:y=(h-text_h)/4:fontsize=60:fontcolor=white:line_spacing=20:enable='between(t,45,53)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${fifthChoices}':x=(w-text_w)/2:y=${fixedQuestionX}/2:fontsize=60:fontcolor=white:line_spacing=130:enable='between(t,45,53)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${fifthAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=60:fontcolor=white:line_spacing=20:enable='between(t,53,55)'`,
       "-preset",
       "ultrafast",
       "-c:a",

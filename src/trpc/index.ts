@@ -52,7 +52,7 @@ export const appRouter = router({
       const allQuestion = await openai.completions.create({
         model: "gpt-3.5-turbo-instruct",
         prompt:
-          "Write 1 general knowledge quiz with 4 choices and answer about " +
+          "Write 1 general knowledge quiz with 4 choices and answer. Keep the question short and simple. " +
           input.prompt +
           " Always start with keyword Question:, example Question: question. Then the choices, A, B, C, and D. Lastly, the correct answer which always must begin with the keyword Answer:, then the correct answer, example: Answer. A. Correct Answer",
         temperature: 1,
@@ -317,13 +317,15 @@ export const appRouter = router({
           expiresIn: 60,
         });
 
-        const questionSpeech = await openai.audio.speech.create({
+        const questionSpeech = openai.audio.speech.create({
           model: "tts-1",
           voice: input.speechVoice,
           input: question,
         });
 
-        const questionBuffer = Buffer.from(await questionSpeech.arrayBuffer());
+        const questionBuffer = Buffer.from(
+          await (await questionSpeech).arrayBuffer()
+        );
 
         const passThroughStream = new PassThrough();
         passThroughStream.write(questionBuffer);
@@ -348,12 +350,11 @@ export const appRouter = router({
         return signedURL.split("?")[0];
       };
 
-      const speechURLs = [];
-      for (let i = 0; i < input.questions.length; i++) {
-        const question = input.questions[i];
-        const speechURL = await uploadSpeechToS3(question, i + 1);
-        speechURLs.push(speechURL);
-      }
+      // Using Promise.all to run all uploads concurrently
+      const uploadPromises = input.questions.map((question, i) =>
+        uploadSpeechToS3(question, i + 1)
+      );
+      const speechURLs = await Promise.all(uploadPromises);
 
       return { speechURLs };
     }),

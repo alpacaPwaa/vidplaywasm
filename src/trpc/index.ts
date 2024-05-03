@@ -44,7 +44,6 @@ export const appRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const regexPattern = /.{1,28}(?:\s+|$)|\n/g;
-
       const openai = new OpenAI({
         apiKey: process.env.OPENAI_API_KEY,
       });
@@ -65,213 +64,60 @@ export const appRouter = router({
 
       console.log(allQuestion);
 
-      const firstQuestionText = allQuestion.choices[0].text;
+      const processQuestion = (questionText: string) => {
+        const questionMatch = questionText.match(
+          /Question:([\s\S]+?)\n[A-D]\. /
+        );
 
-      const firstQuestionMatch = firstQuestionText.match(
-        /Question:([\s\S]+?)\n[A-D]\. /
-      );
+        const question = questionMatch
+          ? questionMatch[1].trim().replace(regexPattern, "$&\n")
+          : "";
 
-      const firstQuestion = firstQuestionMatch
-        ? firstQuestionMatch[1].trim()
-        : "";
+        console.log("Question:", question);
 
-      let concatenatedFirstQuestion = firstQuestion.replace(
-        regexPattern,
-        "$&\n"
-      );
+        const choicesRegex = /[A-D]\. (?!\b[A-D]\.|\nAnswer:\s)(.+?)(?=\n|$)/gs;
+        const choicesMatch = questionText.match(choicesRegex);
+        const choices = choicesMatch
+          ? choicesMatch
+              .filter((choice) => choice.trim())
+              .slice(0, 4)
+              .map((choice) => choice.trim())
+              .join("\n")
+          : "";
 
-      console.log("Question:", concatenatedFirstQuestion);
+        console.log("Choices:", choices);
 
-      const firstChoicesRegex =
-        /[A-D]\. (?!\b[A-D]\.|\nAnswer:\s)(.+?)(?=\n|$)/gs;
-      const firstChoicesMatch = firstQuestionText.match(firstChoicesRegex);
-      const firstChoicesFilter = firstChoicesMatch
-        ? firstChoicesMatch
-            .filter((choice) => choice.trim())
-            .slice(0, 4)
-            .map((choice) => choice.trim())
-        : [];
+        const answerMatch = questionText.match(/Answer: ([A-D]\. .+)/);
+        const answer = answerMatch ? answerMatch[1].trim() : "";
 
-      const firstChoices = firstChoicesFilter.join("\n");
+        console.log("Answer:", answer);
 
-      console.log("Choices:", firstChoices);
-
-      const firstAnswerMatch = firstQuestionText.match(/Answer: ([A-D]\. .+)/);
-      const firstAnswer = firstAnswerMatch ? firstAnswerMatch[1].trim() : "";
-
-      console.log("Answer:", firstAnswer);
-
-      //Second Question
-
-      const secondQuestionText = allQuestion.choices[1].text;
-
-      const secondQuestionMatch = secondQuestionText.match(
-        /Question:([\s\S]+?)\n[A-D]\. /
-      );
-
-      const secondQuestion = secondQuestionMatch
-        ? secondQuestionMatch[1].trim()
-        : "";
-
-      let concatenatedSecondQuestion = secondQuestion.replace(
-        regexPattern,
-        "$&\n"
-      );
-
-      console.log("Question:", concatenatedSecondQuestion);
-
-      const secondChoicesRegex =
-        /[A-D]\. (?!\b[A-D]\.|\nAnswer:\s)(.+?)(?=\n|$)/gs;
-      const secondChoicesMatch = secondQuestionText.match(secondChoicesRegex);
-      const secondChoicesFilter = secondChoicesMatch
-        ? secondChoicesMatch
-            .filter((choice) => choice.trim())
-            .slice(0, 4)
-            .map((choice) => choice.trim())
-        : [];
-
-      const secondChoices = secondChoicesFilter.join("\n");
-
-      console.log("Choices:", secondChoices);
-
-      const secondAnswerMatch =
-        secondQuestionText.match(/Answer: ([A-D]\. .+)/);
-      const secondAnswer = secondAnswerMatch ? secondAnswerMatch[1].trim() : "";
-
-      console.log("Answer:", secondAnswer);
-
-      //Third Question
-
-      const thirdQuestionText = allQuestion.choices[2].text;
-
-      const thirdQuestionMatch = thirdQuestionText.match(
-        /Question:([\s\S]+?)\n[A-D]\. /
-      );
-      const thirdQuestion = thirdQuestionMatch
-        ? thirdQuestionMatch[1].trim()
-        : "";
-
-      let concatenatedThirdQuestion = thirdQuestion.replace(
-        regexPattern,
-        "$&\n"
-      );
-
-      console.log("Question:", concatenatedThirdQuestion);
-
-      const thirdChoicesRegex =
-        /[A-D]\. (?!\b[A-D]\.|\nAnswer:\s)(.+?)(?=\n|$)/gs;
-      const thirdChoicesMatch = thirdQuestionText.match(thirdChoicesRegex);
-      const thirdChoicesFilter = thirdChoicesMatch
-        ? thirdChoicesMatch
-            .filter((choice) => choice.trim())
-            .slice(0, 4)
-            .map((choice) => choice.trim())
-        : [];
-
-      const thirdChoices = thirdChoicesFilter.join("\n");
-
-      console.log("Choices:", thirdChoices);
-
-      const thirdAnswerMatch = thirdQuestionText.match(/Answer: ([A-D]\. .+)/);
-      const thirdAnswer = thirdAnswerMatch ? thirdAnswerMatch[1].trim() : "";
-
-      console.log("Answer:", thirdAnswer);
-
-      //Fourth Question
-
-      const fourthQuestionText = allQuestion.choices[3].text;
-
-      const fourthQuestionMatch = fourthQuestionText.match(
-        /Question:([\s\S]+?)\n[A-D]\. /
-      );
-      const fourthQuestion = fourthQuestionMatch
-        ? fourthQuestionMatch[1].trim()
-        : "";
-
-      let concatenatedFourthQuestion = fourthQuestion.replace(
-        regexPattern,
-        "$&\n"
-      );
-
-      console.log("Question:", concatenatedFourthQuestion);
-
-      const fourthChoicesRegex =
-        /[A-D]\. (?!\b[A-D]\.|\nAnswer:\s)(.+?)(?=\n|$)/gs;
-      const fourthChoicesMatch = fourthQuestionText.match(fourthChoicesRegex);
-      const fourthChoicesFilter = fourthChoicesMatch
-        ? fourthChoicesMatch
-            .filter((choice) => choice.trim())
-            .slice(0, 4)
-            .map((choice) => choice.trim())
-        : [];
-
-      const fourthChoices = fourthChoicesFilter.join("\n");
-
-      console.log("Choices:", fourthChoices);
-
-      const fourthAnswerMatch =
-        fourthQuestionText.match(/Answer: ([A-D]\. .+)/);
-      const fourthAnswer = fourthAnswerMatch ? fourthAnswerMatch[1].trim() : "";
-
-      console.log("Answer:", fourthAnswer);
-
-      //Fifth Question
-
-      const fifthQuestionText = allQuestion.choices[4].text;
-
-      const fifthQuestionMatch = fifthQuestionText.match(
-        /Question:([\s\S]+?)\n[A-D]\. /
-      );
-      const fifthQuestion = fifthQuestionMatch
-        ? fifthQuestionMatch[1].trim()
-        : "";
-
-      let concatenatedFifthQuestion = fifthQuestion.replace(
-        regexPattern,
-        "$&\n"
-      );
-
-      console.log("Question:", concatenatedFifthQuestion);
-
-      const fifthChoicesRegex =
-        /[A-D]\. (?!\b[A-D]\.|\nAnswer:\s)(.+?)(?=\n|$)/gs;
-      const fifthChoicesMatch = fifthQuestionText.match(fifthChoicesRegex);
-      const fifthChoicesFilter = fifthChoicesMatch
-        ? fifthChoicesMatch
-            .filter((choice) => choice.trim())
-            .slice(0, 4)
-            .map((choice) => choice.trim())
-        : [];
-
-      const fifthChoices = fifthChoicesFilter.join("\n");
-
-      console.log("Choices:", fifthChoices);
-
-      const fifthAnswerMatch = fifthQuestionText.match(/Answer: ([A-D]\. .+)/);
-      const fifthAnswer = fifthAnswerMatch ? fifthAnswerMatch[1].trim() : "";
-
-      console.log("Answer:", fifthAnswer);
-      return {
-        concatenatedFirstQuestion,
-        firstChoices,
-        firstAnswer,
-
-        concatenatedSecondQuestion,
-        secondChoices,
-        secondAnswer,
-
-        concatenatedThirdQuestion,
-        thirdChoices,
-        thirdAnswer,
-
-        concatenatedFourthQuestion,
-        fourthChoices,
-        fourthAnswer,
-
-        concatenatedFifthQuestion,
-        fifthChoices,
-        fifthAnswer,
+        return { question, choices, answer };
       };
+
+      const questions = allQuestion.choices.map((choice) =>
+        processQuestion(choice.text)
+      );
+
+      const quizResult = {
+        concatenatedFirstQuestion: questions[0].question,
+        firstChoices: questions[0].choices,
+        firstAnswer: questions[0].answer,
+        concatenatedSecondQuestion: questions[1].question,
+        secondChoices: questions[1].choices,
+        secondAnswer: questions[1].answer,
+        concatenatedThirdQuestion: questions[2].question,
+        thirdChoices: questions[2].choices,
+        thirdAnswer: questions[2].answer,
+        concatenatedFourthQuestion: questions[3].question,
+        fourthChoices: questions[3].choices,
+        fourthAnswer: questions[3].answer,
+        concatenatedFifthQuestion: questions[4].question,
+        fifthChoices: questions[4].choices,
+        fifthAnswer: questions[4].answer,
+      };
+
+      return quizResult;
     }),
 
   generateQuizSpeech: privateProcedure

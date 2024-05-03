@@ -25,24 +25,24 @@ export default function QuizTemplate() {
   const [fourthSpeechDownload, setFourthSpeechDownload] = useState<string>("");
   const [fifthSpeechDownload, setFifthSpeechDownload] = useState<string>("");
 
-  const [firstQuestionOnly, setFirstQuestionOnly] = useState("");
   const [firstQuestion, setFirstQuestion] = useState("");
+  const [firstChoices, setFirstChoices] = useState("");
   const [firstAnswer, setFirstAnswer] = useState("");
 
-  const [secondQuestionOnly, setSecondQuestionOnly] = useState("");
   const [secondQuestion, setSecondQuestion] = useState("");
+  const [secondChoices, setSecondChoices] = useState("");
   const [secondAnswer, setSecondAnswer] = useState("");
 
-  const [thirdQuestionOnly, setThirdQuestionOnly] = useState("");
   const [thirdQuestion, setThirdQuestion] = useState("");
+  const [thirdChoices, setThirdChoices] = useState("");
   const [thirdAnswer, setThirdAnswer] = useState("");
 
-  const [fourthQuestionOnly, setFourthQuestionOnly] = useState("");
   const [fourthQuestion, setFourthQuestion] = useState("");
+  const [fourthChoices, setFourthChoices] = useState("");
   const [fourthAnswer, setFourthAnswer] = useState("");
 
-  const [fifthQuestionOnly, setFifthQuestionOnly] = useState("");
   const [fifthQuestion, setFifthQuestion] = useState("");
+  const [fifthChoices, setFifthChoices] = useState("");
   const [fifthAnswer, setFifthAnswer] = useState("");
 
   const [promptText, setPromptText] = useState("");
@@ -51,51 +51,51 @@ export default function QuizTemplate() {
   const { mutate: generateQuizScript, isLoading: isQuizScriptLoading } =
     trpc.generateQuizScript.useMutation({
       onSuccess: async (data) => {
-        const question1 = data.firstQuestion;
-        const joinedQuestion1 = data.joinedFirstQuestionAndChoices;
+        const question1 = data.concatenatedFirstQuestion;
+        const choices1 = data.firstChoices;
         const answer1 = data.firstAnswer;
 
-        const question2 = data.secondQuestion;
-        const joinedQuestion2 = data.joinedSecondQuestionAndChoices;
+        const question2 = data.concatenatedSecondQuestion;
+        const choices2 = data.secondChoices;
         const answer2 = data.secondAnswer;
 
-        const question3 = data.thirdQuestion;
-        const joinedQuestion3 = data.joinedThirdQuestionAndChoices;
+        const question3 = data.concatenatedThirdQuestion;
+        const choices3 = data.thirdChoices;
         const answer3 = data.thirdAnswer;
 
-        const question4 = data.fourthQuestion;
-        const joinedQuestion4 = data.joinedFourthQuestionAndChoices;
+        const question4 = data.concatenatedFourthQuestion;
+        const choices4 = data.fourthChoices;
         const answer4 = data.fourthAnswer;
 
-        const question5 = data.fifthQuestion;
-        const joinedQuestion5 = data.joinedFifthQuestionAndChoices;
+        const question5 = data.concatenatedFifthQuestion;
+        const choices5 = data.fifthChoices;
         const answer5 = data.fifthAnswer;
 
-        setFirstQuestionOnly(question1);
-        setFirstQuestion(joinedQuestion1);
+        setFirstQuestion(question1);
+        setFirstChoices(choices1);
         setFirstAnswer(answer1);
 
-        setSecondQuestionOnly(question2);
-        setSecondQuestion(joinedQuestion2);
+        setSecondQuestion(question2);
+        setSecondChoices(choices2);
         setSecondAnswer(answer2);
 
-        setThirdQuestionOnly(question3);
-        setThirdQuestion(joinedQuestion3);
+        setThirdQuestion(question3);
+        setThirdChoices(choices3);
         setThirdAnswer(answer3);
 
-        setFourthQuestionOnly(question4);
-        setFourthQuestion(joinedQuestion4);
+        setFourthQuestion(question4);
+        setFourthChoices(choices4);
         setFourthAnswer(answer4);
 
-        setFifthQuestionOnly(question5);
-        setFifthQuestion(joinedQuestion5);
+        setFifthQuestion(question5);
+        setFifthChoices(choices5);
         setFifthAnswer(answer5);
 
-        console.log("First Question", joinedQuestion1);
-        console.log("Second Question", joinedQuestion2);
-        console.log("Third Question", joinedQuestion3);
-        console.log("Fourth Question", joinedQuestion4);
-        console.log("Fifth Question", joinedQuestion5);
+        console.log("First Question", question1);
+        console.log("Second Question", question2);
+        console.log("Third Question", question3);
+        console.log("Fourth Question", question4);
+        console.log("Fifth Question", question5);
       },
       onError: (error) => {
         console.error("Error Generating Quiz:", error);
@@ -105,11 +105,14 @@ export default function QuizTemplate() {
   const { mutate: generateTtsSpeech, isLoading: isSpeechLoading } =
     trpc.generateQuizSpeech.useMutation({
       onSuccess: async (data) => {
-        const firstSpeechFile = data.firstSpeech;
-        const secondSpeechFile = data.secondSpeech;
-        const thirdSpeechFile = data.thirdSpeech;
-        const fourthSpeechFile = data.fourthSpeech;
-        const fifthSpeechFile = data.fifthSpeech;
+        // Assuming data contains an array of speechURLs
+        const [
+          firstSpeechFile,
+          secondSpeechFile,
+          thirdSpeechFile,
+          fourthSpeechFile,
+          fifthSpeechFile,
+        ] = data.speechURLs;
 
         setFirstSpeechDownload(firstSpeechFile);
         setSecondSpeechDownload(secondSpeechFile);
@@ -142,20 +145,41 @@ export default function QuizTemplate() {
 
   const handleGenerateSpeech = (e: React.FormEvent<HTMLElement>) => {
     e.preventDefault();
+    // Create an array to hold the questions
+    const questionsArray = [];
 
-    console.log("clicked");
+    // Push each question into the array if it is not empty
+    if (firstQuestion.trim() !== "") {
+      questionsArray.push(firstQuestion);
+    }
+    if (secondQuestion.trim() !== "") {
+      questionsArray.push(secondQuestion);
+    }
+    if (thirdQuestion.trim() !== "") {
+      questionsArray.push(thirdQuestion);
+    }
+    if (fourthQuestion.trim() !== "") {
+      questionsArray.push(fourthQuestion);
+    }
+    if (fifthQuestion.trim() !== "") {
+      questionsArray.push(fifthQuestion);
+    }
+
+    if (questionsArray.length === 0) {
+      setfirstSpeechError("Please generate a quiz first");
+      return; // Early return if no questions are present
+    }
+
+    console.log("clicked"); // Log before mutation
 
     try {
       generateTtsSpeech({
-        speechVoice: voice,
-        firstQuestion: firstQuestionOnly,
-        secondQuestion: secondQuestionOnly,
-        thirdQuestion: thirdQuestionOnly,
-        fourthQuestion: fourthQuestionOnly,
-        fifthQuestion: fifthQuestionOnly,
+        questions: questionsArray, // Pass the questionsArray to the mutation
+        speechVoice: voice, // Assuming voice is defined elsewhere
       });
     } catch (error) {
       console.error("Error Generating Quiz:", error);
+      // Handle error gracefully, e.g., display an error message to the user
     }
   };
 
@@ -167,27 +191,34 @@ export default function QuizTemplate() {
     const ffmpeg = ffmpegRef.current;
     await ffmpeg.writeFile("input.mp4", await fetchFile(videoFile));
     await ffmpeg.writeFile(
-      "arial.ttf",
+      "Roboto-Regular.ttf",
       await fetchFile(
-        "https://raw.githubusercontent.com/ffmpegwasm/testdata/master/arial.ttf"
+        "https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.1/fonts/roboto/Roboto-Bold.ttf"
       )
     );
+
+    const fixedQuestionY = 500;
 
     // Command for adding text overlay and speech file to the input video
     await ffmpeg.exec([
       "-i",
       "input.mp4",
       "-vf",
-      `drawtext=fontfile=/arial.ttf:text='${firstQuestion}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=55:fontcolor=white:enable='between(t,5,13)',
-      drawtext=fontfile=/arial.ttf:text='${firstAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=55:fontcolor=white:enable='between(t,13,15)',
-      drawtext=fontfile=/arial.ttf:text='${secondQuestion}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=55:fontcolor=white:enable='between(t,15,23)',
-      drawtext=fontfile=/arial.ttf:text='${secondAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=55:fontcolor=white:enable='between(t,23,25)',
-      drawtext=fontfile=/arial.ttf:text='${thirdQuestion}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=55:fontcolor=white:enable='between(t,25,33)',
-      drawtext=fontfile=/arial.ttf:text='${thirdAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=55:fontcolor=white:enable='between(t,33,35)',
-      drawtext=fontfile=/arial.ttf:text='${fourthQuestion}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=55:fontcolor=white:enable='between(t,35,43)',
-      drawtext=fontfile=/arial.ttf:text='${fourthAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=55:fontcolor=white:enable='between(t,43,45)',
-      drawtext=fontfile=/arial.ttf:text='${fifthQuestion}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=55:fontcolor=white:enable='between(t,45,53)',
-      drawtext=fontfile=/arial.ttf:text='${fifthAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=55:fontcolor=white:enable='between(t,53,55)'`,
+      `drawtext=fontfile=/Roboto-Regular.ttf:text='${firstQuestion}':x=(w-text_w)/2:y=${fixedQuestionY}/2:fontsize=55:fontcolor=white:enable='between(t,5,13)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${firstChoices}':x=(w-text_w)/2:y=(2*h/3+text_h*3)/2:fontsize=55:fontcolor=white:enable='between(t,5,13)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${firstAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=55:fontcolor=white:enable='between(t,13,15)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${secondQuestion}':x=(w-text_w)/2:y=${fixedQuestionY}/2:fontsize=55:fontcolor=white:enable='between(t,15,23)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${secondChoices}':x=(w-text_w)/2:y=(2*h/3+text_h*3)/2:fontsize=55:fontcolor=white:enable='between(t,15,23)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${secondAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=55:fontcolor=white:enable='between(t,23,25)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${thirdQuestion}':x=(w-text_w)/2:y=${fixedQuestionY}/2:fontsize=55:fontcolor=white:enable='between(t,25,33)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${thirdChoices}':x=(w-text_w)/2:y=(2*h/3+text_h*3)/2:fontsize=55:fontcolor=white:enable='between(t,25,33)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${thirdAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=55:fontcolor=white:enable='between(t,33,35)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${fourthQuestion}':x=(w-text_w)/2:y=${fixedQuestionY}/2:fontsize=55:fontcolor=white:enable='between(t,35,43)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${fourthChoices}':x=(w-text_w)/2:y=(2*h/3+text_h*3)/2:fontsize=55:fontcolor=white:enable='between(t,35,43)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${fourthAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=55:fontcolor=white:enable='between(t,43,45)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${fifthQuestion}':x=(w-text_w)/2:y=${fixedQuestionY}/2:fontsize=55:fontcolor=white:enable='between(t,45,53)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${fifthChoices}':x=(w-text_w)/2:y=(2*h/3+text_h*3)/2:fontsize=55:fontcolor=white:enable='between(t,45,53)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${fifthAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=55:fontcolor=white:enable='between(t,53,55)'`,
       "-preset",
       "ultrafast",
       "-c:a",
@@ -299,22 +330,27 @@ export default function QuizTemplate() {
                       <>
                         <div className="relative flex flex-col space-y-3">
                           <div className="whitespace-pre">{firstQuestion}</div>
+                          <div className="whitespace-pre">{firstChoices}</div>
                           <div>Answer: {firstAnswer}</div>
                         </div>
                         <div className="relative flex flex-col space-y-3">
                           <div className="whitespace-pre">{secondQuestion}</div>
+                          <div className="whitespace-pre">{secondChoices}</div>
                           <div>Answer: {secondAnswer}</div>
                         </div>
                         <div className="relative flex flex-col space-y-3">
                           <div className="whitespace-pre">{thirdQuestion}</div>
+                          <div className="whitespace-pre">{thirdChoices}</div>
                           <div>Answer: {thirdAnswer}</div>
                         </div>
                         <div className="relative flex flex-col space-y-3">
                           <div className="whitespace-pre">{fourthQuestion}</div>
+                          <div className="whitespace-pre">{fourthChoices}</div>
                           <div>Answer: {fourthAnswer}</div>
                         </div>
                         <div className="relative flex flex-col space-y-3">
                           <div className="whitespace-pre">{fifthQuestion}</div>
+                          <div className="whitespace-pre">{fifthChoices}</div>
                           <div>Answer: {fifthAnswer}</div>
                         </div>
                       </>
@@ -621,7 +657,6 @@ export default function QuizTemplate() {
               >
                 Transcode File
               </button>
-              <p ref={messageRef}></p>
             </div>
           </div>
         </div>

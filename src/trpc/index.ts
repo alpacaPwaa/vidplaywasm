@@ -43,8 +43,7 @@ export const appRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const maxLength = 5;
-      const secondMaxLength = 10;
+      const regexPattern = /.{1,28}(?:\s+|$)|\n/g;
 
       const openai = new OpenAI({
         apiKey: process.env.OPENAI_API_KEY,
@@ -71,32 +70,15 @@ export const appRouter = router({
       const firstQuestionMatch = firstQuestionText.match(
         /Question:([\s\S]+?)\n[A-D]\. /
       );
+
       const firstQuestion = firstQuestionMatch
         ? firstQuestionMatch[1].trim()
         : "";
 
-      const firstQuestionWords = firstQuestion.split(" ");
-      let firstQuestionWordCount = firstQuestionWords.length;
-
-      let concatenatedFirstQuestion = "";
-
-      if (firstQuestionWordCount > secondMaxLength) {
-        concatenatedFirstQuestion = firstQuestionWords
-          .slice(0, maxLength)
-          .join(" ");
-        concatenatedFirstQuestion +=
-          "\n" + firstQuestionWords.slice(maxLength, secondMaxLength).join(" ");
-        concatenatedFirstQuestion +=
-          "\n" + firstQuestionWords.slice(secondMaxLength).join(" ");
-      } else if (firstQuestionWordCount > maxLength) {
-        concatenatedFirstQuestion = firstQuestionWords
-          .slice(0, maxLength)
-          .join(" ");
-        concatenatedFirstQuestion +=
-          "\n" + firstQuestionWords.slice(maxLength).join(" ");
-      } else {
-        concatenatedFirstQuestion = firstQuestion;
-      }
+      let concatenatedFirstQuestion = firstQuestion.replace(
+        regexPattern,
+        "$&\n"
+      );
 
       console.log("Question:", concatenatedFirstQuestion);
 
@@ -114,11 +96,6 @@ export const appRouter = router({
 
       console.log("Choices:", firstChoices);
 
-      const joinedFirstQuestionAndChoices =
-        concatenatedFirstQuestion + "\n\n" + firstChoices;
-
-      console.log("Question and Choices:", joinedFirstQuestionAndChoices);
-
       const firstAnswerMatch = firstQuestionText.match(/Answer: ([A-D]\. .+)/);
       const firstAnswer = firstAnswerMatch ? firstAnswerMatch[1].trim() : "";
 
@@ -131,33 +108,15 @@ export const appRouter = router({
       const secondQuestionMatch = secondQuestionText.match(
         /Question:([\s\S]+?)\n[A-D]\. /
       );
+
       const secondQuestion = secondQuestionMatch
         ? secondQuestionMatch[1].trim()
         : "";
 
-      const secondQuestionWords = secondQuestion.split(" ");
-      let secondQuestionWordCount = secondQuestionWords.length;
-
-      let concatenatedSecondQuestion = "";
-
-      if (secondQuestionWordCount > secondMaxLength) {
-        concatenatedSecondQuestion = secondQuestionWords
-          .slice(0, maxLength)
-          .join(" ");
-        concatenatedSecondQuestion +=
-          "\n" +
-          secondQuestionWords.slice(maxLength, secondMaxLength).join(" ");
-        concatenatedSecondQuestion +=
-          "\n" + secondQuestionWords.slice(secondMaxLength).join(" ");
-      } else if (secondQuestionWordCount > maxLength) {
-        concatenatedSecondQuestion = secondQuestionWords
-          .slice(0, maxLength)
-          .join(" ");
-        concatenatedSecondQuestion +=
-          "\n" + secondQuestionWords.slice(maxLength).join(" ");
-      } else {
-        concatenatedSecondQuestion = secondQuestion;
-      }
+      let concatenatedSecondQuestion = secondQuestion.replace(
+        regexPattern,
+        "$&\n"
+      );
 
       console.log("Question:", concatenatedSecondQuestion);
 
@@ -174,11 +133,6 @@ export const appRouter = router({
       const secondChoices = secondChoicesFilter.join("\n");
 
       console.log("Choices:", secondChoices);
-
-      const joinedSecondQuestionAndChoices =
-        concatenatedSecondQuestion + "\n\n" + secondChoices;
-
-      console.log("Question and Choices:", joinedSecondQuestionAndChoices);
 
       const secondAnswerMatch =
         secondQuestionText.match(/Answer: ([A-D]\. .+)/);
@@ -197,28 +151,10 @@ export const appRouter = router({
         ? thirdQuestionMatch[1].trim()
         : "";
 
-      const thirdQuestionWords = thirdQuestion.split(" ");
-      let thirdQuestionWordCount = thirdQuestionWords.length;
-
-      let concatenatedThirdQuestion = "";
-
-      if (thirdQuestionWordCount > secondMaxLength) {
-        concatenatedThirdQuestion = thirdQuestionWords
-          .slice(0, maxLength)
-          .join(" ");
-        concatenatedThirdQuestion +=
-          "\n" + thirdQuestionWords.slice(maxLength, secondMaxLength).join(" ");
-        concatenatedThirdQuestion +=
-          "\n" + thirdQuestionWords.slice(secondMaxLength).join(" ");
-      } else if (thirdQuestionWordCount > maxLength) {
-        concatenatedThirdQuestion = thirdQuestionWords
-          .slice(0, maxLength)
-          .join(" ");
-        concatenatedThirdQuestion +=
-          "\n" + thirdQuestionWords.slice(maxLength).join(" ");
-      } else {
-        concatenatedThirdQuestion = thirdQuestion;
-      }
+      let concatenatedThirdQuestion = thirdQuestion.replace(
+        regexPattern,
+        "$&\n"
+      );
 
       console.log("Question:", concatenatedThirdQuestion);
 
@@ -236,11 +172,6 @@ export const appRouter = router({
 
       console.log("Choices:", thirdChoices);
 
-      const joinedThirdQuestionAndChoices =
-        concatenatedThirdQuestion + "\n\n" + thirdChoices;
-
-      console.log("Question and Choices:", joinedThirdQuestionAndChoices);
-
       const thirdAnswerMatch = thirdQuestionText.match(/Answer: ([A-D]\. .+)/);
       const thirdAnswer = thirdAnswerMatch ? thirdAnswerMatch[1].trim() : "";
 
@@ -257,29 +188,10 @@ export const appRouter = router({
         ? fourthQuestionMatch[1].trim()
         : "";
 
-      const fourthQuestionWords = fourthQuestion.split(" ");
-      let fourthQuestionWordCount = fourthQuestionWords.length;
-
-      let concatenatedFourthQuestion = "";
-
-      if (fourthQuestionWordCount > secondMaxLength) {
-        concatenatedFourthQuestion = fourthQuestionWords
-          .slice(0, maxLength)
-          .join(" ");
-        concatenatedFourthQuestion +=
-          "\n" +
-          fourthQuestionWords.slice(maxLength, secondMaxLength).join(" ");
-        concatenatedFourthQuestion +=
-          "\n" + fourthQuestionWords.slice(secondMaxLength).join(" ");
-      } else if (fourthQuestionWordCount > maxLength) {
-        concatenatedFourthQuestion = fourthQuestionWords
-          .slice(0, maxLength)
-          .join(" ");
-        concatenatedFourthQuestion +=
-          "\n" + fourthQuestionWords.slice(maxLength).join(" ");
-      } else {
-        concatenatedFourthQuestion = fourthQuestion;
-      }
+      let concatenatedFourthQuestion = fourthQuestion.replace(
+        regexPattern,
+        "$&\n"
+      );
 
       console.log("Question:", concatenatedFourthQuestion);
 
@@ -296,11 +208,6 @@ export const appRouter = router({
       const fourthChoices = fourthChoicesFilter.join("\n");
 
       console.log("Choices:", fourthChoices);
-
-      const joinedFourthQuestionAndChoices =
-        concatenatedFourthQuestion + "\n\n" + fourthChoices;
-
-      console.log("Question and Choices:", joinedFourthQuestionAndChoices);
 
       const fourthAnswerMatch =
         fourthQuestionText.match(/Answer: ([A-D]\. .+)/);
@@ -319,28 +226,10 @@ export const appRouter = router({
         ? fifthQuestionMatch[1].trim()
         : "";
 
-      const fifthQuestionWords = fifthQuestion.split(" ");
-      let fifthQuestionWordCount = fifthQuestionWords.length;
-
-      let concatenatedFifthQuestion = "";
-
-      if (fifthQuestionWordCount > secondMaxLength) {
-        concatenatedFifthQuestion = fifthQuestionWords
-          .slice(0, maxLength)
-          .join(" ");
-        concatenatedFifthQuestion +=
-          "\n" + fifthQuestionWords.slice(maxLength, secondMaxLength).join(" ");
-        concatenatedFifthQuestion +=
-          "\n" + fifthQuestionWords.slice(secondMaxLength).join(" ");
-      } else if (fifthQuestionWordCount > maxLength) {
-        concatenatedFifthQuestion = fifthQuestionWords
-          .slice(0, maxLength)
-          .join(" ");
-        concatenatedFifthQuestion +=
-          "\n" + fifthQuestionWords.slice(maxLength).join(" ");
-      } else {
-        concatenatedFifthQuestion = fifthQuestion;
-      }
+      let concatenatedFifthQuestion = fifthQuestion.replace(
+        regexPattern,
+        "$&\n"
+      );
 
       console.log("Question:", concatenatedFifthQuestion);
 
@@ -358,34 +247,29 @@ export const appRouter = router({
 
       console.log("Choices:", fifthChoices);
 
-      const joinedFifthQuestionAndChoices =
-        concatenatedFifthQuestion + "\n\n" + fifthChoices;
-
-      console.log("Question and Choices:", joinedFifthQuestionAndChoices);
-
       const fifthAnswerMatch = fifthQuestionText.match(/Answer: ([A-D]\. .+)/);
       const fifthAnswer = fifthAnswerMatch ? fifthAnswerMatch[1].trim() : "";
 
       console.log("Answer:", fifthAnswer);
       return {
-        firstQuestion,
-        joinedFirstQuestionAndChoices,
+        concatenatedFirstQuestion,
+        firstChoices,
         firstAnswer,
 
-        secondQuestion,
-        joinedSecondQuestionAndChoices,
+        concatenatedSecondQuestion,
+        secondChoices,
         secondAnswer,
 
-        thirdQuestion,
-        joinedThirdQuestionAndChoices,
+        concatenatedThirdQuestion,
+        thirdChoices,
         thirdAnswer,
 
-        fourthQuestion,
-        joinedFourthQuestionAndChoices,
+        concatenatedFourthQuestion,
+        fourthChoices,
         fourthAnswer,
 
-        fifthQuestion,
-        joinedFifthQuestionAndChoices,
+        concatenatedFifthQuestion,
+        fifthChoices,
         fifthAnswer,
       };
     }),
@@ -401,11 +285,7 @@ export const appRouter = router({
           "nova",
           "shimmer",
         ]),
-        firstQuestion: z.string(),
-        secondQuestion: z.string(),
-        thirdQuestion: z.string(),
-        fourthQuestion: z.string(),
-        fifthQuestion: z.string(),
+        questions: z.array(z.string()), // Array of questions
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -421,261 +301,61 @@ export const appRouter = router({
         },
       });
 
-      const generateFirstFileName = (bytes = 32) =>
+      const generateFileName = (bytes = 32) =>
         crypto.randomBytes(bytes).toString("hex");
 
-      const firstSpeechURL = generateFirstFileName();
+      const uploadSpeechToS3 = async (
+        question: string,
+        questionNumber: number
+      ) => {
+        const speechURL = generateFileName();
+        const putObjectCommand = new PutObjectCommand({
+          Bucket: process.env.AWS_BUCKET_NAME!,
+          Key: speechURL,
+        });
+        const signedURL = await getSignedUrl(s3, putObjectCommand, {
+          expiresIn: 60,
+        });
 
-      const putFirstObjectCommand = new PutObjectCommand({
-        Bucket: process.env.AWS_BUCKET_NAME!,
-        Key: firstSpeechURL,
-      });
+        const questionSpeech = await openai.audio.speech.create({
+          model: "tts-1",
+          voice: input.speechVoice,
+          input: question,
+        });
 
-      const firstSingedURL = await getSignedUrl(s3, putFirstObjectCommand, {
-        expiresIn: 60,
-      });
+        const questionBuffer = Buffer.from(await questionSpeech.arrayBuffer());
 
-      const firstQuestionSpeech = await openai.audio.speech.create({
-        model: "tts-1",
-        voice: input.speechVoice,
-        input: input.firstQuestion,
-      });
+        const passThroughStream = new PassThrough();
+        passThroughStream.write(questionBuffer);
+        passThroughStream.end();
 
-      const firstQuestionBuffer = Buffer.from(
-        await firstQuestionSpeech.arrayBuffer()
-      );
-
-      const uploadFirstSpeechToS3 = async (stream: PassThrough) => {
         const upload = new Upload({
           client: s3,
           params: {
             Bucket: process.env.AWS_BUCKET_NAME!,
-            Key: firstSpeechURL,
-            Body: stream,
+            Key: speechURL,
+            Body: passThroughStream,
             ContentType: "audio/mpeg",
           },
         });
         await upload.done();
+
+        console.log(
+          `Uploaded TTS audio to S3: s3://${process.env
+            .AWS_BUCKET_NAME!}/${speechURL}`
+        );
+
+        return signedURL.split("?")[0];
       };
 
-      const passThroughStreamFirstSpeeh = new PassThrough();
-      passThroughStreamFirstSpeeh.write(firstQuestionBuffer);
-      passThroughStreamFirstSpeeh.end();
+      const speechURLs = [];
+      for (let i = 0; i < input.questions.length; i++) {
+        const question = input.questions[i];
+        const speechURL = await uploadSpeechToS3(question, i + 1);
+        speechURLs.push(speechURL);
+      }
 
-      await uploadFirstSpeechToS3(passThroughStreamFirstSpeeh);
-
-      console.log(
-        `Uploaded TTS audio to S3: s3://${process.env
-          .AWS_BUCKET_NAME!}/${generateFirstFileName()}`
-      );
-
-      //Second Speech
-
-      const generateSecondFileName = (bytes = 32) =>
-        crypto.randomBytes(bytes).toString("hex");
-
-      const secondSpeechURL = generateSecondFileName();
-
-      const putSecondObjectCommand = new PutObjectCommand({
-        Bucket: process.env.AWS_BUCKET_NAME!,
-        Key: secondSpeechURL,
-      });
-
-      const secondSingedURL = await getSignedUrl(s3, putSecondObjectCommand, {
-        expiresIn: 60,
-      });
-
-      const secondQuestionSpeech = await openai.audio.speech.create({
-        model: "tts-1",
-        voice: input.speechVoice,
-        input: input.secondQuestion,
-      });
-
-      const secondQuestionBuffer = Buffer.from(
-        await secondQuestionSpeech.arrayBuffer()
-      );
-
-      const uploadSecondSpeechToS3 = async (stream: PassThrough) => {
-        const upload = new Upload({
-          client: s3,
-          params: {
-            Bucket: process.env.AWS_BUCKET_NAME!,
-            Key: secondSpeechURL,
-            Body: stream,
-            ContentType: "audio/mpeg",
-          },
-        });
-        await upload.done();
-      };
-
-      const passThroughStreamSecondSpeeh = new PassThrough();
-      passThroughStreamSecondSpeeh.write(secondQuestionBuffer);
-      passThroughStreamSecondSpeeh.end();
-
-      await uploadSecondSpeechToS3(passThroughStreamSecondSpeeh);
-
-      console.log(
-        `Uploaded TTS audio to S3: s3://${process.env
-          .AWS_BUCKET_NAME!}/${generateSecondFileName()}`
-      );
-
-      //Third Speech
-
-      const generateThirdFileName = (bytes = 32) =>
-        crypto.randomBytes(bytes).toString("hex");
-
-      const thirdSpeechURL = generateThirdFileName();
-
-      const putThirdObjectCommand = new PutObjectCommand({
-        Bucket: process.env.AWS_BUCKET_NAME!,
-        Key: thirdSpeechURL,
-      });
-
-      const thirdSingedURL = await getSignedUrl(s3, putThirdObjectCommand, {
-        expiresIn: 60,
-      });
-
-      const thirdQuestionSpeech = await openai.audio.speech.create({
-        model: "tts-1",
-        voice: input.speechVoice,
-        input: input.thirdQuestion,
-      });
-
-      const thirdQuestionBuffer = Buffer.from(
-        await thirdQuestionSpeech.arrayBuffer()
-      );
-
-      const uploadThirdSpeechToS3 = async (stream: PassThrough) => {
-        const upload = new Upload({
-          client: s3,
-          params: {
-            Bucket: process.env.AWS_BUCKET_NAME!,
-            Key: thirdSpeechURL,
-            Body: stream,
-            ContentType: "audio/mpeg",
-          },
-        });
-        await upload.done();
-      };
-
-      const passThroughStreamThirdSpeech = new PassThrough();
-      passThroughStreamThirdSpeech.write(thirdQuestionBuffer);
-      passThroughStreamThirdSpeech.end();
-
-      await uploadThirdSpeechToS3(passThroughStreamThirdSpeech);
-
-      console.log(
-        `Uploaded TTS audio to S3: s3://${process.env
-          .AWS_BUCKET_NAME!}/${generateThirdFileName()}`
-      );
-
-      //Fourth Speech
-
-      const generateFourthFileName = (bytes = 32) =>
-        crypto.randomBytes(bytes).toString("hex");
-
-      const fourthSpeechURL = generateFourthFileName();
-
-      const putFourthObjectCommand = new PutObjectCommand({
-        Bucket: process.env.AWS_BUCKET_NAME!,
-        Key: fourthSpeechURL,
-      });
-
-      const fourthSingedURL = await getSignedUrl(s3, putFourthObjectCommand, {
-        expiresIn: 60,
-      });
-
-      const fourthQuestionSpeech = await openai.audio.speech.create({
-        model: "tts-1",
-        voice: input.speechVoice,
-        input: input.fourthQuestion,
-      });
-
-      const fourthQuestionBuffer = Buffer.from(
-        await fourthQuestionSpeech.arrayBuffer()
-      );
-
-      const uploadFourthSpeechToS3 = async (stream: PassThrough) => {
-        const upload = new Upload({
-          client: s3,
-          params: {
-            Bucket: process.env.AWS_BUCKET_NAME!,
-            Key: fourthSpeechURL,
-            Body: stream,
-            ContentType: "audio/mpeg",
-          },
-        });
-        await upload.done();
-      };
-
-      const passThroughStreamFourthSpeech = new PassThrough();
-      passThroughStreamFourthSpeech.write(fourthQuestionBuffer);
-      passThroughStreamFourthSpeech.end();
-
-      await uploadFourthSpeechToS3(passThroughStreamFourthSpeech);
-
-      console.log(
-        `Uploaded TTS audio to S3: s3://${process.env
-          .AWS_BUCKET_NAME!}/${generateFourthFileName()}`
-      );
-
-      //Fifth Speech
-
-      const generateFifthFileName = (bytes = 32) =>
-        crypto.randomBytes(bytes).toString("hex");
-
-      const fifthSpeechURL = generateFifthFileName();
-
-      const putFifthObjectCommand = new PutObjectCommand({
-        Bucket: process.env.AWS_BUCKET_NAME!,
-        Key: fifthSpeechURL,
-      });
-
-      const fifthSingedURL = await getSignedUrl(s3, putFifthObjectCommand, {
-        expiresIn: 60,
-      });
-
-      const fifthQuestionSpeech = await openai.audio.speech.create({
-        model: "tts-1",
-        voice: input.speechVoice,
-        input: input.fifthQuestion,
-      });
-
-      const fifthQuestionBuffer = Buffer.from(
-        await fifthQuestionSpeech.arrayBuffer()
-      );
-
-      const uploadFifthSpeechToS3 = async (stream: PassThrough) => {
-        const upload = new Upload({
-          client: s3,
-          params: {
-            Bucket: process.env.AWS_BUCKET_NAME!,
-            Key: fifthSpeechURL,
-            Body: stream,
-            ContentType: "audio/mpeg",
-          },
-        });
-        await upload.done();
-      };
-
-      const passThroughStreamFifthSpeech = new PassThrough();
-      passThroughStreamFifthSpeech.write(fifthQuestionBuffer);
-      passThroughStreamFifthSpeech.end();
-
-      await uploadFifthSpeechToS3(passThroughStreamFifthSpeech);
-
-      console.log(
-        `Uploaded TTS audio to S3: s3://${process.env
-          .AWS_BUCKET_NAME!}/${generateFifthFileName()}`
-      );
-
-      return {
-        firstSpeech: firstSingedURL.split("?")[0],
-        secondSpeech: secondSingedURL.split("?")[0],
-        thirdSpeech: thirdSingedURL.split("?")[0],
-        fourthSpeech: fourthSingedURL.split("?")[0],
-        fifthSpeech: fifthSingedURL.split("?")[0],
-      };
+      return { speechURLs };
     }),
 });
 

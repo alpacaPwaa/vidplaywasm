@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/app/_trpc/client";
 import { Button } from "../ui/button";
-import { Ghost, Loader2 } from "lucide-react";
+import { CheckCheck, Ghost, Loader2, Video } from "lucide-react";
 
 export default function QuizTemplate() {
   const [transcodeFile, setTranscodeFile] = useState<string | null>(null);
@@ -397,7 +397,7 @@ export default function QuizTemplate() {
                   </label>
                   <div
                     id="template-videos"
-                    className="relative flex flex-col space-y-3 max-h-[120px] overflow-y-auto border border-gray-300 rounded-md p-3"
+                    className="relative flex flex-col space-y-3 max-h-[175px] overflow-y-auto border border-gray-300 rounded-md p-3"
                   >
                     <div
                       className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
@@ -468,60 +468,23 @@ export default function QuizTemplate() {
                   </div>
                 </div>
 
-                <div className="relative flex flex-col space-y-3">
-                  <label
-                    htmlFor="text-to-speech"
-                    className="text-md font-medium"
-                  >
-                    Text to Speech
-                  </label>
+                {firstSpeechDownload && (
                   <div
                     id="text-to-speech"
-                    className="relative flex flex-col space-y-3 max-h-[170px] overflow-y-auto border border-gray-300 rounded-md p-3"
+                    className="flex bg-green-500 rounded-md p-3"
                   >
-                    {firstSpeechDownload ? (
-                      <div className="relative flex flex-col space-y-3">
-                        <audio
-                          src={firstSpeechDownload}
-                          className="flex w-full"
-                          controls
-                        />
-                        <audio
-                          src={secondSpeechDownload}
-                          className="flex w-full"
-                          controls
-                        />
-                        <audio
-                          src={thirdSpeechDownload}
-                          className="flex w-full"
-                          controls
-                        />
-                        <audio
-                          src={fourthSpeechDownload}
-                          className="flex w-full"
-                          controls
-                        />
-                        <audio
-                          src={fifthSpeechDownload}
-                          className="flex w-full"
-                          controls
-                        />
+                    <div className="flex align-middle space-x-3">
+                      <CheckCheck />
+                      <div className="font-medium text-md">
+                        Text to speech generated successfully
                       </div>
-                    ) : (
-                      <div className="flex flex-col items-center gap-2">
-                        <Ghost className="h-8 w-8 text-zinc-800" />
-                        <h3 className="font-semibold text-lg">
-                          Pretty empty around here
-                        </h3>
-                        <p>Let&apos;s generate your TTS.</p>
-                      </div>
-                    )}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 <Button
                   type="submit"
-                  disabled={isSpeechLoading}
+                  disabled
                   variant="destructive"
                   className={
                     "bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-600 transition duration-300 ease-in-out"
@@ -530,7 +493,7 @@ export default function QuizTemplate() {
                   {isSpeechLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
-                    "Generate Text to Speech"
+                    "Text to Speech Coming Soon"
                   )}
                 </Button>
               </div>
@@ -694,7 +657,13 @@ export default function QuizTemplate() {
                 />
               </div>
             ) : (
-              <p>Select a Background Video to Get Started</p>
+              <div className="flex flex-col items-center gap-2">
+                <Video className="h-8 w-8 text-zinc-800" />
+                <h3 className="font-semibold text-lg">
+                  Pretty empty around here
+                </h3>
+                <p>Let&apos;s generate you first video.</p>
+              </div>
             )}
           </div>
         </div>

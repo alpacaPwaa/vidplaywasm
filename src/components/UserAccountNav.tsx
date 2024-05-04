@@ -24,14 +24,10 @@ async function UserAccountNav({ email, imageUrl, name }: UserAccountNavProps) {
       <DropdownMenuTrigger asChild className="overflow-visible">
         <Button className="rounded-full h-8 w-8 aspect-square bg-slate-400">
           <Avatar className="relative w-8 h-8">
-            {imageUrl ? (
-              <div className="relative aspect-square h-full w-full"></div>
-            ) : (
-              <AvatarFallback>
-                <span className="sr-only">{name}</span>
-                <Icons.user className="h-4 w-4 text-zinc-900" />
-              </AvatarFallback>
-            )}
+            <AvatarFallback>
+              <span className="sr-only">{name}</span>
+              <Icons.user className="h-4 w-4 text-zinc-900" />
+            </AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>

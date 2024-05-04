@@ -7,7 +7,6 @@ import {
 } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback } from "./ui/avatar";
-import Image from "next/image";
 import { Icons } from "./Icons";
 import Link from "next/link";
 import { Gem } from "lucide-react";
@@ -26,14 +25,7 @@ async function UserAccountNav({ email, imageUrl, name }: UserAccountNavProps) {
         <Button className="rounded-full h-8 w-8 aspect-square bg-slate-400">
           <Avatar className="relative w-8 h-8">
             {imageUrl ? (
-              <div className="relative aspect-square h-full w-full">
-                <Image
-                  fill
-                  src={imageUrl}
-                  alt="Profile Picture"
-                  referrerPolicy="no-referrer"
-                />
-              </div>
+              <div className="relative aspect-square h-full w-full"></div>
             ) : (
               <AvatarFallback>
                 <span className="sr-only">{name}</span>

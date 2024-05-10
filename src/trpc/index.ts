@@ -53,7 +53,7 @@ export const appRouter = router({
         prompt:
           "Write 1 general knowledge quiz with 4 choices and answer. Keep the question short and simple. " +
           input.prompt +
-          " Avoid duplicate questions. Always start with keyword Question:, example Question: question. Then the choices, A, B, C, and D. Lastly, the correct answer which always must begin with the keyword Answer:, then the correct answer, example: Answer. A. Correct Answer. You must not use diacritical marks, :, ', and apostrophes. Example: instead Beyoncé, you can say Beyonce.",
+          " Avoid duplicate questions. Always start with keyword Question:, example Question: question. Then the choices, A, B, C, and D. Lastly, the correct answer which always must begin with the keyword Answer:, then the correct answer, example: Answer. A. Correct Answer.",
         temperature: 1,
         max_tokens: 256,
         n: 5,
@@ -223,9 +223,9 @@ export const appRouter = router({
       const allQuestion = await openai.completions.create({
         model: "gpt-3.5-turbo-instruct",
         prompt:
-          "Write 1 riddle quiz with 4 choices and answer. Keep the riddle short and simple. " +
+          "Write 1 riddle with 4 choices and answer. " +
           input.prompt +
-          " Avoid duplicate riddle. Always start with keyword Riddle:, example Riddle: question. Then the choices, A, B, C, and D. Lastly, the correct answer which always must begin with the keyword Answer:, then the correct answer, example: Answer. A. Correct Answer. You must not use diacritical marks, :, ', and apostrophes. Example: instead Beyoncé, you can say Beyonce.",
+          " Avoid duplicate riddle. Always start with keyword Riddle:, example Riddle: question. Then the choices, A, B, C, and D. Lastly, the correct answer which always must begin with the keyword Answer:, then the correct answer, example: Answer. A. Correct Answer.",
         temperature: 1,
         max_tokens: 256,
         n: 5,

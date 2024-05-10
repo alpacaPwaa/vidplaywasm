@@ -3,12 +3,11 @@
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
 import { useEffect, useRef, useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/app/_trpc/client";
 import { Button } from "../ui/button";
 import { CheckCheck, Ghost, Loader2, Video } from "lucide-react";
 
-export default function QuizTemplate() {
+export default function RiddleMeThisTemplate() {
   const [transcodeFile, setTranscodeFile] = useState<string | null>(null);
   const [videoFile, setVideoFile] = useState("/templates/template1/video1.mp4");
   const [voice, setVoice] = useState<
@@ -25,85 +24,85 @@ export default function QuizTemplate() {
   const [fourthSpeechDownload, setFourthSpeechDownload] = useState<string>("");
   const [fifthSpeechDownload, setFifthSpeechDownload] = useState<string>("");
 
-  const [firstQuestion, setFirstQuestion] = useState("");
+  const [firstRiddle, setFirstRiddle] = useState("");
   const [firstChoices, setFirstChoices] = useState("");
   const [firstAnswer, setFirstAnswer] = useState("");
 
-  const [secondQuestion, setSecondQuestion] = useState("");
+  const [secondRiddle, setSecondRiddle] = useState("");
   const [secondChoices, setSecondChoices] = useState("");
   const [secondAnswer, setSecondAnswer] = useState("");
 
-  const [thirdQuestion, setThirdQuestion] = useState("");
+  const [thirdRiddle, setThirdRiddle] = useState("");
   const [thirdChoices, setThirdChoices] = useState("");
   const [thirdAnswer, setThirdAnswer] = useState("");
 
-  const [fourthQuestion, setFourthQuestion] = useState("");
+  const [fourthRiddle, setFourthRiddle] = useState("");
   const [fourthChoices, setFourthChoices] = useState("");
   const [fourthAnswer, setFourthAnswer] = useState("");
 
-  const [fifthQuestion, setFifthQuestion] = useState("");
+  const [fifthRiddle, setFifthRiddle] = useState("");
   const [fifthChoices, setFifthChoices] = useState("");
   const [fifthAnswer, setFifthAnswer] = useState("");
 
   const [promptText, setPromptText] = useState("");
   const [promtError, setPromptError] = useState("");
 
-  const { mutate: generateQuizScript, isLoading: isQuizScriptLoading } =
-    trpc.generateQuizScript.useMutation({
+  const { mutate: generateRiddleScript, isLoading: isQuizScriptLoading } =
+    trpc.generateRiddleScript.useMutation({
       onSuccess: async (data) => {
-        const question1 = data.concatenatedFirstQuestion;
+        const riddle1 = data.concatenatedFirstQuestion;
         const choices1 = data.firstChoices;
         const answer1 = data.firstAnswer;
 
-        const question2 = data.concatenatedSecondQuestion;
+        const riddle2 = data.concatenatedSecondQuestion;
         const choices2 = data.secondChoices;
         const answer2 = data.secondAnswer;
 
-        const question3 = data.concatenatedThirdQuestion;
+        const riddle3 = data.concatenatedThirdQuestion;
         const choices3 = data.thirdChoices;
         const answer3 = data.thirdAnswer;
 
-        const question4 = data.concatenatedFourthQuestion;
+        const riddle4 = data.concatenatedFourthQuestion;
         const choices4 = data.fourthChoices;
         const answer4 = data.fourthAnswer;
 
-        const question5 = data.concatenatedFifthQuestion;
+        const riddle5 = data.concatenatedFifthQuestion;
         const choices5 = data.fifthChoices;
         const answer5 = data.fifthAnswer;
 
-        setFirstQuestion(question1);
+        setFirstRiddle(riddle1);
         setFirstChoices(choices1);
         setFirstAnswer(answer1);
 
-        setSecondQuestion(question2);
+        setSecondRiddle(riddle2);
         setSecondChoices(choices2);
         setSecondAnswer(answer2);
 
-        setThirdQuestion(question3);
+        setThirdRiddle(riddle3);
         setThirdChoices(choices3);
         setThirdAnswer(answer3);
 
-        setFourthQuestion(question4);
+        setFourthRiddle(riddle4);
         setFourthChoices(choices4);
         setFourthAnswer(answer4);
 
-        setFifthQuestion(question5);
+        setFifthRiddle(riddle5);
         setFifthChoices(choices5);
         setFifthAnswer(answer5);
 
-        console.log("First Question", question1);
-        console.log("Second Question", question2);
-        console.log("Third Question", question3);
-        console.log("Fourth Question", question4);
-        console.log("Fifth Question", question5);
+        console.log("First Question", riddle1);
+        console.log("Second Question", riddle2);
+        console.log("Third Question", riddle3);
+        console.log("Fourth Question", riddle4);
+        console.log("Fifth Question", riddle5);
       },
       onError: (error) => {
         console.error("Error Generating Quiz:", error);
       },
     });
 
-  const { mutate: generateTtsSpeech, isLoading: isSpeechLoading } =
-    trpc.generateQuizSpeech.useMutation({
+  const { mutate: generateRiddleSpeech, isLoading: isSpeechLoading } =
+    trpc.generateRiddleSpeech.useMutation({
       onSuccess: async (data) => {
         // Assuming data contains an array of speechURLs
         const [
@@ -136,7 +135,7 @@ export default function QuizTemplate() {
     console.log("clicked"); // Log before mutation
 
     try {
-      generateQuizScript({ prompt: promptText });
+      generateRiddleScript({ prompt: promptText });
     } catch (error) {
       console.error("Error Generating Speech:", error);
       // Handle error gracefully, e.g., display an error message to the user
@@ -149,20 +148,20 @@ export default function QuizTemplate() {
     const questionsArray = [];
 
     // Push each question into the array if it is not empty
-    if (firstQuestion.trim() !== "") {
-      questionsArray.push(firstQuestion);
+    if (firstRiddle.trim() !== "") {
+      questionsArray.push(firstRiddle);
     }
-    if (secondQuestion.trim() !== "") {
-      questionsArray.push(secondQuestion);
+    if (secondRiddle.trim() !== "") {
+      questionsArray.push(secondRiddle);
     }
-    if (thirdQuestion.trim() !== "") {
-      questionsArray.push(thirdQuestion);
+    if (thirdRiddle.trim() !== "") {
+      questionsArray.push(thirdRiddle);
     }
-    if (fourthQuestion.trim() !== "") {
-      questionsArray.push(fourthQuestion);
+    if (fourthRiddle.trim() !== "") {
+      questionsArray.push(fourthRiddle);
     }
-    if (fifthQuestion.trim() !== "") {
-      questionsArray.push(fifthQuestion);
+    if (fifthRiddle.trim() !== "") {
+      questionsArray.push(fifthRiddle);
     }
 
     if (questionsArray.length === 0) {
@@ -173,7 +172,7 @@ export default function QuizTemplate() {
     console.log("clicked"); // Log before mutation
 
     try {
-      generateTtsSpeech({
+      generateRiddleSpeech({
         questions: questionsArray, // Pass the questionsArray to the mutation
         speechVoice: voice, // Assuming voice is defined elsewhere
       });
@@ -212,19 +211,19 @@ export default function QuizTemplate() {
       "-i",
       "input.mp4",
       "-vf",
-      `drawtext=fontfile=/Roboto-Regular.ttf:text='${firstQuestion}':x=(w-text_w)/2:y=(h-text_h)/4:fontsize=60:fontcolor=black:line_spacing=20:enable='between(t,5,13)',
+      `drawtext=fontfile=/Roboto-Regular.ttf:text='${firstRiddle}':x=(w-text_w)/2:y=(h-text_h)/4:fontsize=60:fontcolor=black:line_spacing=20:enable='between(t,5,13)',
       drawtext=fontfile=/Roboto-Regular.ttf:text='${firstChoices}':x=(w-text_w)/2:y=${fixedQuestionX}/2:fontsize=60:fontcolor=white:line_spacing=130:enable='between(t,5,13)',
       drawtext=fontfile=/Roboto-Regular.ttf:text='${firstAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=60:fontcolor=white:line_spacing=20:enable='between(t,13,15)',
-      drawtext=fontfile=/Roboto-Regular.ttf:text='${secondQuestion}':x=(w-text_w)/2:y=(h-text_h)/4:fontsize=60:fontcolor=black:line_spacing=20:enable='between(t,15,23)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${secondRiddle}':x=(w-text_w)/2:y=(h-text_h)/4:fontsize=60:fontcolor=black:line_spacing=20:enable='between(t,15,23)',
       drawtext=fontfile=/Roboto-Regular.ttf:text='${secondChoices}':x=(w-text_w)/2:y=${fixedQuestionX}/2:fontsize=60:fontcolor=white:line_spacing=130:enable='between(t,15,23)',
       drawtext=fontfile=/Roboto-Regular.ttf:text='${secondAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=60:fontcolor=white:line_spacing=20:enable='between(t,23,25)',
-      drawtext=fontfile=/Roboto-Regular.ttf:text='${thirdQuestion}':x=(w-text_w)/2:y=(h-text_h)/4:fontsize=60:fontcolor=black:line_spacing=20:enable='between(t,25,33)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${thirdRiddle}':x=(w-text_w)/2:y=(h-text_h)/4:fontsize=60:fontcolor=black:line_spacing=20:enable='between(t,25,33)',
       drawtext=fontfile=/Roboto-Regular.ttf:text='${thirdChoices}':x=(w-text_w)/2:y=${fixedQuestionX}/2:fontsize=60:fontcolor=white:line_spacing=130:enable='between(t,25,33)',
       drawtext=fontfile=/Roboto-Regular.ttf:text='${thirdAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=60:fontcolor=white:line_spacing=20:enable='between(t,33,35)',
-      drawtext=fontfile=/Roboto-Regular.ttf:text='${fourthQuestion}':x=(w-text_w)/2:y=(h-text_h)/4:fontsize=60:fontcolor=black:line_spacing=20:enable='between(t,35,43)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${fourthRiddle}':x=(w-text_w)/2:y=(h-text_h)/4:fontsize=60:fontcolor=black:line_spacing=20:enable='between(t,35,43)',
       drawtext=fontfile=/Roboto-Regular.ttf:text='${fourthChoices}':x=(w-text_w)/2:y=${fixedQuestionX}/2:fontsize=60:fontcolor=white:line_spacing=130:enable='between(t,35,43)',
       drawtext=fontfile=/Roboto-Regular.ttf:text='${fourthAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=60:fontcolor=white:line_spacing=20:enable='between(t,43,45)',
-      drawtext=fontfile=/Roboto-Regular.ttf:text='${fifthQuestion}':x=(w-text_w)/2:y=(h-text_h)/4:fontsize=60:fontcolor=black:line_spacing=20:enable='between(t,45,53)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${fifthRiddle}':x=(w-text_w)/2:y=(h-text_h)/4:fontsize=60:fontcolor=black:line_spacing=20:enable='between(t,45,53)',
       drawtext=fontfile=/Roboto-Regular.ttf:text='${fifthChoices}':x=(w-text_w)/2:y=${fixedQuestionX}/2:fontsize=60:fontcolor=white:line_spacing=130:enable='between(t,45,53)',
       drawtext=fontfile=/Roboto-Regular.ttf:text='${fifthAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=60:fontcolor=white:line_spacing=20:enable='between(t,53,55)'`,
       "-preset",
@@ -334,30 +333,30 @@ export default function QuizTemplate() {
                     id="template-videos"
                     className="relative flex flex-col space-y-3 max-h-[170px] overflow-y-auto border border-gray-300 rounded-md p-3"
                   >
-                    {firstQuestion ? (
+                    {firstRiddle ? (
                       <>
                         <div className="relative flex flex-col space-y-3">
-                          <div className="whitespace-pre">{firstQuestion}</div>
+                          <div className="whitespace-pre">{firstRiddle}</div>
                           <div className="whitespace-pre">{firstChoices}</div>
                           <div>Answer: {firstAnswer}</div>
                         </div>
                         <div className="relative flex flex-col space-y-3">
-                          <div className="whitespace-pre">{secondQuestion}</div>
+                          <div className="whitespace-pre">{secondRiddle}</div>
                           <div className="whitespace-pre">{secondChoices}</div>
                           <div>Answer: {secondAnswer}</div>
                         </div>
                         <div className="relative flex flex-col space-y-3">
-                          <div className="whitespace-pre">{thirdQuestion}</div>
+                          <div className="whitespace-pre">{thirdRiddle}</div>
                           <div className="whitespace-pre">{thirdChoices}</div>
                           <div>Answer: {thirdAnswer}</div>
                         </div>
                         <div className="relative flex flex-col space-y-3">
-                          <div className="whitespace-pre">{fourthQuestion}</div>
+                          <div className="whitespace-pre">{fourthRiddle}</div>
                           <div className="whitespace-pre">{fourthChoices}</div>
                           <div>Answer: {fourthAnswer}</div>
                         </div>
                         <div className="relative flex flex-col space-y-3">
-                          <div className="whitespace-pre">{fifthQuestion}</div>
+                          <div className="whitespace-pre">{fifthRiddle}</div>
                           <div className="whitespace-pre">{fifthChoices}</div>
                           <div>Answer: {fifthAnswer}</div>
                         </div>
@@ -368,7 +367,7 @@ export default function QuizTemplate() {
                         <h3 className="font-semibold text-lg">
                           Pretty empty around here
                         </h3>
-                        <p>Let&apos;s generate you first quiz.</p>
+                        <p>Let&apos;s generate you first riddle.</p>
                       </div>
                     )}
                   </div>
@@ -385,7 +384,7 @@ export default function QuizTemplate() {
                   {isQuizScriptLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
-                    "Generate Quiz"
+                    "Generate Riddle"
                   )}
                 </Button>
               </div>
@@ -712,7 +711,7 @@ export default function QuizTemplate() {
                   "bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-600 transition duration-300 ease-in-out"
                 }
               >
-                Create Multiple Choice Quiz
+                Create Riddle
               </button>
             </div>
           </div>

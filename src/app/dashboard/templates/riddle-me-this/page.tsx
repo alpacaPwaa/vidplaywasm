@@ -1,5 +1,7 @@
+import RiddleMeThisTemplate from "@/components/templates/RiddleMeThisTemplate";
+
 const Page = async () => {
-  return <div>Hi</div>;
+  return <RiddleMeThisTemplate />;
 };
 
 export default Page;

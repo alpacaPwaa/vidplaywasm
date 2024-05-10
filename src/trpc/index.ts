@@ -51,12 +51,11 @@ export const appRouter = router({
       const allQuestion = await openai.completions.create({
         model: "gpt-3.5-turbo-instruct",
         prompt:
-          "Write 1 unique general knowledge quiz with 4 choices and answer. Keep the question short and simple. " +
+          "Write 1 general knowledge quiz with 4 choices and answer. Keep the question short and simple. " +
           input.prompt +
-          " Always start with keyword Question:, example Question: question. Then the choices, A, B, C, and D. Lastly, the correct answer which always must begin with the keyword Answer:, then the correct answer, example: Answer. A. Correct Answer. You must not use diacritical marks, :, ', and apostrophes. Example: instead Beyoncé, you can say Beyonce.",
+          " Avoid duplicate questions. Always start with keyword Question:, example Question: question. Then the choices, A, B, C, and D. Lastly, the correct answer which always must begin with the keyword Answer:, then the correct answer, example: Answer. A. Correct Answer. You must not use diacritical marks, :, ', and apostrophes. Example: instead Beyoncé, you can say Beyonce.",
         temperature: 1,
         max_tokens: 256,
-        top_p: 1,
         n: 5,
         frequency_penalty: 1,
         presence_penalty: 1,
@@ -70,7 +69,10 @@ export const appRouter = router({
         );
 
         const question = questionMatch
-          ? questionMatch[1].trim().replace(regexPattern, "$&\n")
+          ? questionMatch[1]
+              .trim()
+              .replace(regexPattern, "$&\n")
+              .replace(/[\\\%\'\:]+/g, " ")
           : "";
 
         console.log("Question:", question);
@@ -83,6 +85,7 @@ export const appRouter = router({
               .slice(0, 4)
               .map((choice) => choice.trim())
               .join("\n")
+              .replace(/[\\\%\'\:]+/g, " ")
           : "";
 
         console.log("Choices:", choices);
@@ -121,6 +124,176 @@ export const appRouter = router({
     }),
 
   generateQuizSpeech: privateProcedure
+    .input(
+      z.object({
+        speechVoice: z.enum([
+          "alloy",
+          "echo",
+          "fable",
+          "onyx",
+          "nova",
+          "shimmer",
+        ]),
+        questions: z.array(z.string()), // Array of questions
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const openai = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+      });
+
+      const s3 = new S3Client({
+        region: process.env.AWS_BUCKET_REGION!,
+        credentials: {
+          accessKeyId: process.env.AWS_BUCKET_ACCESS_KEY!,
+          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+        },
+      });
+
+      const generateFileName = (bytes = 32) =>
+        crypto.randomBytes(bytes).toString("hex");
+
+      const uploadSpeechToS3 = async (
+        question: string,
+        questionNumber: number
+      ) => {
+        const speechURL = generateFileName();
+        const putObjectCommand = new PutObjectCommand({
+          Bucket: process.env.AWS_BUCKET_NAME!,
+          Key: speechURL,
+        });
+        const signedURL = await getSignedUrl(s3, putObjectCommand, {
+          expiresIn: 60,
+        });
+
+        const questionSpeech = openai.audio.speech.create({
+          model: "tts-1",
+          voice: input.speechVoice,
+          input: question,
+        });
+
+        const questionBuffer = Buffer.from(
+          await (await questionSpeech).arrayBuffer()
+        );
+
+        const passThroughStream = new PassThrough();
+        passThroughStream.write(questionBuffer);
+        passThroughStream.end();
+
+        const upload = new Upload({
+          client: s3,
+          params: {
+            Bucket: process.env.AWS_BUCKET_NAME!,
+            Key: speechURL,
+            Body: passThroughStream,
+            ContentType: "audio/mpeg",
+          },
+        });
+        await upload.done();
+
+        console.log(
+          `Uploaded TTS audio to S3: s3://${process.env
+            .AWS_BUCKET_NAME!}/${speechURL}`
+        );
+
+        return signedURL.split("?")[0];
+      };
+
+      // Using Promise.all to run all uploads concurrently
+      const uploadPromises = input.questions.map((question, i) =>
+        uploadSpeechToS3(question, i + 1)
+      );
+      const speechURLs = await Promise.all(uploadPromises);
+
+      return { speechURLs };
+    }),
+
+  generateRiddleScript: privateProcedure
+    .input(
+      z.object({
+        prompt: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const regexPattern = /.{1,28}(?:\s+|$)|\n/g;
+      const openai = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+      });
+
+      const allQuestion = await openai.completions.create({
+        model: "gpt-3.5-turbo-instruct",
+        prompt:
+          "Write 1 riddle quiz with 4 choices and answer. Keep the riddle short and simple. " +
+          input.prompt +
+          " Avoid duplicate riddle. Always start with keyword Riddle:, example Riddle: question. Then the choices, A, B, C, and D. Lastly, the correct answer which always must begin with the keyword Answer:, then the correct answer, example: Answer. A. Correct Answer. You must not use diacritical marks, :, ', and apostrophes. Example: instead Beyoncé, you can say Beyonce.",
+        temperature: 1,
+        max_tokens: 256,
+        n: 5,
+        frequency_penalty: 1,
+        presence_penalty: 1,
+      });
+
+      console.log(allQuestion);
+
+      const processQuestion = (questionText: string) => {
+        const questionMatch = questionText.match(/Riddle:([\s\S]+?)\n[A-D]\. /);
+
+        const question = questionMatch
+          ? questionMatch[1]
+              .trim()
+              .replace(regexPattern, "$&\n")
+              .replace(/[\\\%\'\:]+/g, " ")
+          : "";
+
+        console.log("Question:", question);
+
+        const choicesRegex = /[A-D]\. (?!\b[A-D]\.|\nAnswer:\s)(.+?)(?=\n|$)/gs;
+        const choicesMatch = questionText.match(choicesRegex);
+        const choices = choicesMatch
+          ? choicesMatch
+              .filter((choice) => choice.trim())
+              .slice(0, 4)
+              .map((choice) => choice.trim())
+              .join("\n")
+              .replace(/[\\\%\'\:]+/g, " ")
+          : "";
+
+        console.log("Choices:", choices);
+
+        const answerMatch = questionText.match(/Answer: ([A-D]\. .+)/);
+        const answer = answerMatch ? answerMatch[1].trim() : "";
+
+        console.log("Answer:", answer);
+
+        return { question, choices, answer };
+      };
+
+      const questions = allQuestion.choices.map((choice) =>
+        processQuestion(choice.text)
+      );
+
+      const quizResult = {
+        concatenatedFirstQuestion: questions[0].question,
+        firstChoices: questions[0].choices,
+        firstAnswer: questions[0].answer,
+        concatenatedSecondQuestion: questions[1].question,
+        secondChoices: questions[1].choices,
+        secondAnswer: questions[1].answer,
+        concatenatedThirdQuestion: questions[2].question,
+        thirdChoices: questions[2].choices,
+        thirdAnswer: questions[2].answer,
+        concatenatedFourthQuestion: questions[3].question,
+        fourthChoices: questions[3].choices,
+        fourthAnswer: questions[3].answer,
+        concatenatedFifthQuestion: questions[4].question,
+        fifthChoices: questions[4].choices,
+        fifthAnswer: questions[4].answer,
+      };
+
+      return quizResult;
+    }),
+
+  generateRiddleSpeech: privateProcedure
     .input(
       z.object({
         speechVoice: z.enum([

@@ -190,6 +190,14 @@ export default function QuizTemplate() {
   const transcode = async () => {
     const ffmpeg = ffmpegRef.current;
     await ffmpeg.writeFile("input.mp4", await fetchFile(videoFile));
+    // await ffmpeg.writeFile(
+    //   "firstSpeechInput.mp3",
+    //   await fetchFile(firstSpeechDownload)
+    // );
+    // await ffmpeg.writeFile(
+    //   "secondSpeechInput.mp3",
+    //   await fetchFile(secondSpeechDownload)
+    // );
     await ffmpeg.writeFile(
       "Roboto-Regular.ttf",
       await fetchFile(
@@ -197,28 +205,28 @@ export default function QuizTemplate() {
       )
     );
 
-    const fixedQuestionX = 1700;
+    const fixedQuestionX = 2100;
 
     // Command for adding text overlay and speech file to the input video
     await ffmpeg.exec([
       "-i",
       "input.mp4",
       "-vf",
-      `drawtext=fontfile=/Roboto-Regular.ttf:text='${firstQuestion}':x=(w-text_w)/2:y=(h-text_h)/4:fontsize=60:fontcolor=white:line_spacing=20:enable='between(t,5,11)',
-      drawtext=fontfile=/Roboto-Regular.ttf:text='${firstChoices}':x=(w-text_w)/2:y=${fixedQuestionX}/2:fontsize=60:fontcolor=white:line_spacing=130:enable='between(t,5,11)',
-      drawtext=fontfile=/Roboto-Regular.ttf:text='${firstAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=60:fontcolor=white:line_spacing=20:enable='between(t,11,13)',
-      drawtext=fontfile=/Roboto-Regular.ttf:text='${secondQuestion}':x=(w-text_w)/2:y=(h-text_h)/4:fontsize=60:fontcolor=white:line_spacing=20:enable='between(t,13,19)',
-      drawtext=fontfile=/Roboto-Regular.ttf:text='${secondChoices}':x=(w-text_w)/2:y=${fixedQuestionX}/2:fontsize=60:fontcolor=white:line_spacing=130:enable='between(t,13,19)',
-      drawtext=fontfile=/Roboto-Regular.ttf:text='${secondAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=60:fontcolor=white:line_spacing=20:enable='between(t,19,21)',
-      drawtext=fontfile=/Roboto-Regular.ttf:text='${thirdQuestion}':x=(w-text_w)/2:y=(h-text_h)/4:fontsize=60:fontcolor=white:line_spacing=20:enable='between(t,21,27)',
-      drawtext=fontfile=/Roboto-Regular.ttf:text='${thirdChoices}':x=(w-text_w)/2:y=${fixedQuestionX}/2:fontsize=60:fontcolor=white:line_spacing=130:enable='between(t,21,27)',
-      drawtext=fontfile=/Roboto-Regular.ttf:text='${thirdAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=60:fontcolor=white:line_spacing=20:enable='between(t,27,29)',
-      drawtext=fontfile=/Roboto-Regular.ttf:text='${fourthQuestion}':x=(w-text_w)/2:y=(h-text_h)/4:fontsize=60:fontcolor=white:line_spacing=20:enable='between(t,29,35)',
-      drawtext=fontfile=/Roboto-Regular.ttf:text='${fourthChoices}':x=(w-text_w)/2:y=${fixedQuestionX}/2:fontsize=60:fontcolor=white:line_spacing=130:enable='between(t,29,35)',
-      drawtext=fontfile=/Roboto-Regular.ttf:text='${fourthAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=60:fontcolor=white:line_spacing=20:enable='between(t,35,37)',
-      drawtext=fontfile=/Roboto-Regular.ttf:text='${fifthQuestion}':x=(w-text_w)/2:y=(h-text_h)/4:fontsize=60:fontcolor=white:line_spacing=20:enable='between(t,37,43)',
-      drawtext=fontfile=/Roboto-Regular.ttf:text='${fifthChoices}':x=(w-text_w)/2:y=${fixedQuestionX}/2:fontsize=60:fontcolor=white:line_spacing=130:enable='between(t,37,43)',
-      drawtext=fontfile=/Roboto-Regular.ttf:text='${fifthAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=60:fontcolor=white:line_spacing=20:enable='between(t,43,45)'`,
+      `drawtext=fontfile=/Roboto-Regular.ttf:text='${firstQuestion}':x=(w-text_w)/2:y=(h-text_h)/4:fontsize=60:fontcolor=black:line_spacing=20:enable='between(t,5,13)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${firstChoices}':x=(w-text_w)/2:y=${fixedQuestionX}/2:fontsize=60:fontcolor=white:line_spacing=130:enable='between(t,5,13)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${firstAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=60:fontcolor=white:line_spacing=20:enable='between(t,13,15)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${secondQuestion}':x=(w-text_w)/2:y=(h-text_h)/4:fontsize=60:fontcolor=black:line_spacing=20:enable='between(t,15,23)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${secondChoices}':x=(w-text_w)/2:y=${fixedQuestionX}/2:fontsize=60:fontcolor=white:line_spacing=130:enable='between(t,15,23)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${secondAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=60:fontcolor=white:line_spacing=20:enable='between(t,23,25)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${thirdQuestion}':x=(w-text_w)/2:y=(h-text_h)/4:fontsize=60:fontcolor=black:line_spacing=20:enable='between(t,25,33)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${thirdChoices}':x=(w-text_w)/2:y=${fixedQuestionX}/2:fontsize=60:fontcolor=white:line_spacing=130:enable='between(t,25,33)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${thirdAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=60:fontcolor=white:line_spacing=20:enable='between(t,33,35)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${fourthQuestion}':x=(w-text_w)/2:y=(h-text_h)/4:fontsize=60:fontcolor=black:line_spacing=20:enable='between(t,35,43)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${fourthChoices}':x=(w-text_w)/2:y=${fixedQuestionX}/2:fontsize=60:fontcolor=white:line_spacing=130:enable='between(t,35,43)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${fourthAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=60:fontcolor=white:line_spacing=20:enable='between(t,43,45)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${fifthQuestion}':x=(w-text_w)/2:y=(h-text_h)/4:fontsize=60:fontcolor=black:line_spacing=20:enable='between(t,45,53)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${fifthChoices}':x=(w-text_w)/2:y=${fixedQuestionX}/2:fontsize=60:fontcolor=white:line_spacing=130:enable='between(t,45,53)',
+      drawtext=fontfile=/Roboto-Regular.ttf:text='${fifthAnswer}':x=(w-text_w)/2:y=(h-text_h)/2:fontsize=60:fontcolor=white:line_spacing=20:enable='between(t,53,55)'`,
       "-preset",
       "ultrafast",
       "-c:a",
@@ -529,7 +537,7 @@ export default function QuizTemplate() {
                     </div>
                     <div className="template-info text-center flex-grow pl-4">
                       <div className="h-full flex font-medium text-md">
-                        Video 1
+                        Yellow
                       </div>
                     </div>
                   </div>
@@ -551,7 +559,7 @@ export default function QuizTemplate() {
                     </div>
                     <div className="template-info text-center flex-grow pl-3">
                       <div className="h-full flex font-medium text-md">
-                        Video 2
+                        Green
                       </div>
                     </div>
                   </div>
@@ -573,7 +581,7 @@ export default function QuizTemplate() {
                     </div>
                     <div className="template-info text-center flex-grow pl-3">
                       <div className="h-full flex font-medium text-md">
-                        Video 3
+                        Blue
                       </div>
                     </div>
                   </div>
@@ -594,9 +602,7 @@ export default function QuizTemplate() {
                       ></video>
                     </div>
                     <div className="template-info text-center flex-grow pl-3">
-                      <div className="h-full flex font-medium text-md">
-                        Video 4
-                      </div>
+                      <div className="h-full flex font-medium text-md">Red</div>
                     </div>
                   </div>
                   <div
@@ -617,7 +623,73 @@ export default function QuizTemplate() {
                     </div>
                     <div className="template-info text-center flex-grow pl-3">
                       <div className="h-full flex font-medium text-md">
-                        Video 5
+                        Orange Plain
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
+                      videoFile === "/templates/template1/video6.mp4"
+                        ? "border-blue-500"
+                        : "border-gray-300"
+                    }`}
+                    onClick={() =>
+                      setVideoFile("/templates/template1/video6.mp4")
+                    }
+                  >
+                    <div className="template-video bg-gray-200 rounded-sm">
+                      <video
+                        src="/templates/template1/video6.mp4"
+                        className="w-20 h-12 p-1"
+                      ></video>
+                    </div>
+                    <div className="template-info text-center flex-grow pl-3">
+                      <div className="h-full flex font-medium text-md">
+                        Yellow Plain
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
+                      videoFile === "/templates/template1/video7.mp4"
+                        ? "border-blue-500"
+                        : "border-gray-300"
+                    }`}
+                    onClick={() =>
+                      setVideoFile("/templates/template1/video7.mp4")
+                    }
+                  >
+                    <div className="template-video bg-gray-200 rounded-sm">
+                      <video
+                        src="/templates/template1/video7.mp4"
+                        className="w-20 h-12 p-1"
+                      ></video>
+                    </div>
+                    <div className="template-info text-center flex-grow pl-3">
+                      <div className="h-full flex font-medium text-md">
+                        Green Plain
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
+                      videoFile === "/templates/template1/video8.mp4"
+                        ? "border-blue-500"
+                        : "border-gray-300"
+                    }`}
+                    onClick={() =>
+                      setVideoFile("/templates/template1/video8.mp4")
+                    }
+                  >
+                    <div className="template-video bg-gray-200 rounded-sm">
+                      <video
+                        src="/templates/template1/video8.mp4"
+                        className="w-20 h-12 p-1"
+                      ></video>
+                    </div>
+                    <div className="template-info text-center flex-grow pl-3">
+                      <div className="h-full flex font-medium text-md">
+                        Blue Plain
                       </div>
                     </div>
                   </div>

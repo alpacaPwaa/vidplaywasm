@@ -28,29 +28,35 @@ const Dashboard = () => {
       </div>
 
       {/* display all templates */}
-      <ul className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-5">
-        <li onClick={handleGeneralKnowledgeTemplate}>
-          <div className="flex flex-col gap-2 rounded-lg bg-white shadow transition hover:shadow-lg cursor-pointer">
-            <div className="flex w-full items-center justify-center space-x-6">
-              <video
-                src="/templates-thumbnail/generalquizthumbnail.mp4"
-                className="h-auto w-5/12 p-2"
-              ></video>
-            </div>
+      <ul className="mt-8 grid grid-cols-1 gap-6 divide-y divide-zinc-200 md:grid-cols-2 lg:grid-cols-5">
+        <li
+          className="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow transition hover:shadow-lg cursor-pointer"
+          onClick={handleGeneralKnowledgeTemplate}
+        >
+          <div className="flex w-full items-center justify-center">
+            <video
+              src="/templates-thumbnail/generalquizthumbnail.mp4"
+              className="w-1/3 p-1"
+            />
           </div>
-          <div className="mt-2 font-semibold">General Knowledge Quiz</div>
+          <div className="flex w-full items-center font-semibold p-2">
+            General Knowledge Quiz
+          </div>
         </li>
 
-        <li onClick={handleRiddleMethis}>
-          <div className="flex flex-col gap-2 rounded-lg bg-white shadow transition hover:shadow-lg cursor-pointer">
-            <div className="flex w-full items-center justify-center space-x-6">
-              <video
-                src="/templates-thumbnail/riddlemethisthumbnail.mp4"
-                className="h-auto w-5/12 p-2"
-              ></video>
-            </div>
+        <li
+          className="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow transition hover:shadow-lg cursor-pointer"
+          onClick={handleRiddleMethis}
+        >
+          <div className="flex w-full items-center justify-center">
+            <video
+              src="/templates-thumbnail/riddlemethisthumbnail.mp4"
+              className="w-1/3 p-1"
+            />
           </div>
-          <div className="mt-2 font-semibold">Riddle Me This</div>
+          <div className="flex w-full items-center font-semibold p-2">
+            Riddle Me This
+          </div>
         </li>
       </ul>
     </main>

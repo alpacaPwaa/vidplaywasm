@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const Dashboard = () => {
   const router = useRouter();
@@ -34,9 +35,12 @@ const Dashboard = () => {
           onClick={handleGeneralKnowledgeTemplate}
         >
           <div className="flex w-full items-center justify-center">
-            <video
-              src="/templates-thumbnail/generalquizthumbnail.mp4"
-              className="w-1/3 p-1"
+            <Image
+              src="/templates-thumbnail/generalquizthumbnail.png"
+              alt="product preview"
+              className="p-1"
+              width={75}
+              height={10}
             />
           </div>
           <div className="flex w-full items-center font-semibold p-2">
@@ -49,9 +53,12 @@ const Dashboard = () => {
           onClick={handleRiddleMethis}
         >
           <div className="flex w-full items-center justify-center">
-            <video
-              src="/templates-thumbnail/riddlemethisthumbnail.mp4"
-              className="w-1/3 p-1"
+            <Image
+              src="/templates-thumbnail/riddlemethisthumbnail.png"
+              alt="product preview"
+              className="p-1"
+              width={75}
+              height={10}
             />
           </div>
           <div className="flex w-full items-center font-semibold p-2">

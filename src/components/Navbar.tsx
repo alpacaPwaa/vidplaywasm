@@ -49,7 +49,7 @@ async function NavBar() {
                     size: "sm",
                   })}
                 >
-                  Get Started For FREE <ArrowRight className="ml-1.5 h-5 w-5" />
+                  Get Started <ArrowRight className="ml-1.5 h-5 w-5" />
                 </RegisterLink>
               </>
             ) : (

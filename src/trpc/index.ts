@@ -36,6 +36,49 @@ export const appRouter = router({
     return { success: true };
   }),
 
+  updateUserPlan: privateProcedure.query(async () => {
+    const { getUser } = getKindeServerSession();
+    const user = await getUser();
+
+    if (!user || !user.id || !user.email)
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+
+    const dbUser = await db.user.findFirst({
+      where: {
+        id: user.id,
+      },
+    });
+
+    if (!dbUser) {
+      await db.user.update({
+        data: {
+          userPlan: "PRO",
+        },
+        where: {
+          id: user.id,
+        },
+      });
+    }
+
+    return { success: true };
+  }),
+
+  getUserPlanStatus: privateProcedure.query(async () => {
+    const { getUser } = getKindeServerSession();
+    const user = await getUser();
+
+    if (!user || !user.id || !user.email)
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+
+    const dbUser = await db.user.findFirst({
+      where: {
+        id: user.id,
+      },
+    });
+
+    return { status: dbUser?.userPlan };
+  }),
+
   generateQuizScript: privateProcedure
     .input(
       z.object({

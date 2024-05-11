@@ -47,6 +47,8 @@ export default function RiddleMeThisTemplate() {
   const [promptText, setPromptText] = useState("");
   const [promtError, setPromptError] = useState("");
 
+  const { data: userStatus, isLoading } = trpc.getUserPlanStatus.useQuery();
+
   const { mutate: generateRiddleScript, isLoading: isQuizScriptLoading } =
     trpc.generateRiddleScript.useMutation({
       onSuccess: async (data) => {
@@ -318,7 +320,7 @@ export default function RiddleMeThisTemplate() {
                       width: "100%",
                       height: "100px",
                     }}
-                    placeholder="Example: Geography Quiz"
+                    placeholder="Example: A riddle about life, wisdom, and philosophy"
                   />
                 </div>
 
@@ -705,14 +707,19 @@ export default function RiddleMeThisTemplate() {
                 </div>
               </div>
 
-              <button
+              <Button
                 onClick={transcode}
+                disabled={userStatus?.status === "FREE"}
                 className={
                   "bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-600 transition duration-300 ease-in-out"
                 }
               >
-                Create Riddle
-              </button>
+                {userStatus?.status === "FREE" ? (
+                  <div>Activate Your Account</div>
+                ) : (
+                  <div>Generate Riddle</div>
+                )}
+              </Button>
             </div>
           </div>
         </div>

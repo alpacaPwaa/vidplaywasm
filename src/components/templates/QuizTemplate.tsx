@@ -48,6 +48,8 @@ export default function QuizTemplate() {
   const [promptText, setPromptText] = useState("");
   const [promtError, setPromptError] = useState("");
 
+  const { data: userStatus, isLoading } = trpc.getUserPlanStatus.useQuery();
+
   const { mutate: generateQuizScript, isLoading: isQuizScriptLoading } =
     trpc.generateQuizScript.useMutation({
       onSuccess: async (data) => {
@@ -705,15 +707,19 @@ export default function QuizTemplate() {
                   <p ref={messageRef}></p>
                 </div>
               </div>
-
-              <button
+              <Button
                 onClick={transcode}
+                disabled={userStatus?.status === "FREE"}
                 className={
                   "bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-600 transition duration-300 ease-in-out"
                 }
               >
-                Create Multiple Choice Quiz
-              </button>
+                {userStatus?.status === "FREE" ? (
+                  <div>Activate Your Account</div>
+                ) : (
+                  <div>Generate General Knowledge Quiz</div>
+                )}
+              </Button>
             </div>
           </div>
         </div>

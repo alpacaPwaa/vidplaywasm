@@ -292,11 +292,11 @@ export default function RiddleMeThisTemplate() {
   }, []);
 
   return (
-    <div className="flex-1 justify-between flex flex-col h-[calc(100vh-3.5rem)]">
+    <div className="flex-1 justify-between flex flex-col">
       <div className="mx-auto w-full max-w-8xl grow lg:flex">
         {/* Left sidebar */}
         <div className="flex-1 xl:flex">
-          <div className="px-4 py-6 sm:px-6 lg:pl-8 xl:flex-1 xl:pl-6 bg-zinc-50 h-screen overflow-y-auto space-y-5">
+          <div className="px-4 py-6 sm:px-6 lg:pl-8 xl:flex-1 xl:pl-6 bg-zinc-50 h-[calc(100vh-3.5rem)] overflow-y-auto space-y-5">
             <div className="font-medium text-2xl">Generate Script</div>
             <form
               onSubmit={handleGenerateQuiz}

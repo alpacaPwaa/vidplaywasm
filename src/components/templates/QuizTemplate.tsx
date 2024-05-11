@@ -519,7 +519,7 @@ export default function QuizTemplate() {
                   id="template-videos"
                   className="relative flex flex-col space-y-3 max-h-[170px] overflow-y-auto border border-gray-300 rounded-md p-3"
                 >
-                  <div
+                  {/* <div
                     className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
                       videoFile === "/templates/template1/video1.mp4"
                         ? "border-blue-500"
@@ -537,7 +537,7 @@ export default function QuizTemplate() {
                     </div>
                     <div className="template-info text-center flex-grow pl-4">
                       <div className="h-full flex font-medium text-md">
-                        Yellow
+                        Blue Plain
                       </div>
                     </div>
                   </div>
@@ -559,7 +559,7 @@ export default function QuizTemplate() {
                     </div>
                     <div className="template-info text-center flex-grow pl-3">
                       <div className="h-full flex font-medium text-md">
-                        Green
+                        Green Pain
                       </div>
                     </div>
                   </div>
@@ -581,7 +581,7 @@ export default function QuizTemplate() {
                     </div>
                     <div className="template-info text-center flex-grow pl-3">
                       <div className="h-full flex font-medium text-md">
-                        Blue
+                        Yellow Plain
                       </div>
                     </div>
                   </div>
@@ -602,9 +602,11 @@ export default function QuizTemplate() {
                       ></video>
                     </div>
                     <div className="template-info text-center flex-grow pl-3">
-                      <div className="h-full flex font-medium text-md">Red</div>
+                      <div className="h-full flex font-medium text-md">
+                        Orange Plain
+                      </div>
                     </div>
-                  </div>
+                  </div> */}
                   <div
                     className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
                       videoFile === "/templates/template1/video5.mp4"
@@ -622,9 +624,7 @@ export default function QuizTemplate() {
                       ></video>
                     </div>
                     <div className="template-info text-center flex-grow pl-3">
-                      <div className="h-full flex font-medium text-md">
-                        Orange Plain
-                      </div>
+                      <div className="h-full flex font-medium text-md">Red</div>
                     </div>
                   </div>
                   <div
@@ -645,7 +645,7 @@ export default function QuizTemplate() {
                     </div>
                     <div className="template-info text-center flex-grow pl-3">
                       <div className="h-full flex font-medium text-md">
-                        Yellow Plain
+                        Blue
                       </div>
                     </div>
                   </div>
@@ -667,7 +667,7 @@ export default function QuizTemplate() {
                     </div>
                     <div className="template-info text-center flex-grow pl-3">
                       <div className="h-full flex font-medium text-md">
-                        Green Plain
+                        Green
                       </div>
                     </div>
                   </div>
@@ -689,7 +689,7 @@ export default function QuizTemplate() {
                     </div>
                     <div className="template-info text-center flex-grow pl-3">
                       <div className="h-full flex font-medium text-md">
-                        Blue Plain
+                        Yellow
                       </div>
                     </div>
                   </div>

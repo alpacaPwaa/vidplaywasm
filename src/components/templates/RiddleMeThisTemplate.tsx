@@ -518,127 +518,63 @@ export default function RiddleMeThisTemplate() {
                   id="template-videos"
                   className="relative flex flex-col space-y-3 max-h-[170px] overflow-y-auto border border-gray-300 rounded-md p-3"
                 >
-                  <div
+                  {/* <div
                     className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
-                      videoFile === "/templates/template1/video1.mp4"
+                      videoFile === "/templates/template2/video1.mp4"
                         ? "border-blue-500"
                         : "border-gray-300"
                     }`}
                     onClick={() =>
-                      setVideoFile("/templates/template1/video1.mp4")
+                      setVideoFile("/templates/template2/video1.mp4")
                     }
                   >
                     <div className="template-video bg-gray-200 rounded-sm">
                       <video
-                        src="/templates/template1/video1.mp4"
+                        src="/templates/template2/video1.mp4"
                         className="w-20 h-12 p-1"
                       ></video>
                     </div>
                     <div className="template-info text-center flex-grow pl-4">
                       <div className="h-full flex font-medium text-md">
-                        Yellow
+                        Blue Plain
                       </div>
                     </div>
                   </div>
                   <div
                     className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
-                      videoFile === "/templates/template1/video2.mp4"
+                      videoFile === "/templates/template2/video2.mp4"
                         ? "border-blue-500"
                         : "border-gray-300"
                     }`}
                     onClick={() =>
-                      setVideoFile("/templates/template1/video2.mp4")
+                      setVideoFile("/templates/template2/video2.mp4")
                     }
                   >
                     <div className="template-video bg-gray-200 rounded-sm">
                       <video
-                        src="/templates/template1/video2.mp4"
+                        src="/templates/template2/video2.mp4"
                         className="w-20 h-12 p-1"
                       ></video>
                     </div>
                     <div className="template-info text-center flex-grow pl-3">
                       <div className="h-full flex font-medium text-md">
-                        Green
+                        Green Pain
                       </div>
                     </div>
                   </div>
                   <div
                     className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
-                      videoFile === "/templates/template1/video3.mp4"
+                      videoFile === "/templates/template2/video3.mp4"
                         ? "border-blue-500"
                         : "border-gray-300"
                     }`}
                     onClick={() =>
-                      setVideoFile("/templates/template1/video3.mp4")
+                      setVideoFile("/templates/template2/video3.mp4")
                     }
                   >
                     <div className="template-video bg-gray-200 rounded-sm">
                       <video
-                        src="/templates/template1/video3.mp4"
-                        className="w-20 h-12 p-1"
-                      ></video>
-                    </div>
-                    <div className="template-info text-center flex-grow pl-3">
-                      <div className="h-full flex font-medium text-md">
-                        Blue
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
-                      videoFile === "/templates/template1/video4.mp4"
-                        ? "border-blue-500"
-                        : "border-gray-300"
-                    }`}
-                    onClick={() =>
-                      setVideoFile("/templates/template1/video4.mp4")
-                    }
-                  >
-                    <div className="template-video bg-gray-200 rounded-sm">
-                      <video
-                        src="/templates/template1/video4.mp4"
-                        className="w-20 h-12 p-1"
-                      ></video>
-                    </div>
-                    <div className="template-info text-center flex-grow pl-3">
-                      <div className="h-full flex font-medium text-md">Red</div>
-                    </div>
-                  </div>
-                  <div
-                    className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
-                      videoFile === "/templates/template1/video5.mp4"
-                        ? "border-blue-500"
-                        : "border-gray-300"
-                    }`}
-                    onClick={() =>
-                      setVideoFile("/templates/template1/video5.mp4")
-                    }
-                  >
-                    <div className="template-video bg-gray-200 rounded-sm">
-                      <video
-                        src="/templates/template1/video5.mp4"
-                        className="w-20 h-12 p-1"
-                      ></video>
-                    </div>
-                    <div className="template-info text-center flex-grow pl-3">
-                      <div className="h-full flex font-medium text-md">
-                        Orange Plain
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
-                      videoFile === "/templates/template1/video6.mp4"
-                        ? "border-blue-500"
-                        : "border-gray-300"
-                    }`}
-                    onClick={() =>
-                      setVideoFile("/templates/template1/video6.mp4")
-                    }
-                  >
-                    <div className="template-video bg-gray-200 rounded-sm">
-                      <video
-                        src="/templates/template1/video6.mp4"
+                        src="/templates/template2/video3.mp4"
                         className="w-20 h-12 p-1"
                       ></video>
                     </div>
@@ -650,45 +586,109 @@ export default function RiddleMeThisTemplate() {
                   </div>
                   <div
                     className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
-                      videoFile === "/templates/template1/video7.mp4"
+                      videoFile === "/templates/template2/video4.mp4"
                         ? "border-blue-500"
                         : "border-gray-300"
                     }`}
                     onClick={() =>
-                      setVideoFile("/templates/template1/video7.mp4")
+                      setVideoFile("/templates/template2/video4.mp4")
                     }
                   >
                     <div className="template-video bg-gray-200 rounded-sm">
                       <video
-                        src="/templates/template1/video7.mp4"
+                        src="/templates/template2/video4.mp4"
                         className="w-20 h-12 p-1"
                       ></video>
                     </div>
                     <div className="template-info text-center flex-grow pl-3">
                       <div className="h-full flex font-medium text-md">
-                        Green Plain
+                        Orange Plain
+                      </div>
+                    </div>
+                  </div> */}
+                  <div
+                    className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
+                      videoFile === "/templates/template2/video5.mp4"
+                        ? "border-blue-500"
+                        : "border-gray-300"
+                    }`}
+                    onClick={() =>
+                      setVideoFile("/templates/template2/video5.mp4")
+                    }
+                  >
+                    <div className="template-video bg-gray-200 rounded-sm">
+                      <video
+                        src="/templates/template2/video5.mp4"
+                        className="w-20 h-12 p-1"
+                      ></video>
+                    </div>
+                    <div className="template-info text-center flex-grow pl-3">
+                      <div className="h-full flex font-medium text-md">Red</div>
+                    </div>
+                  </div>
+                  <div
+                    className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
+                      videoFile === "/templates/template2/video6.mp4"
+                        ? "border-blue-500"
+                        : "border-gray-300"
+                    }`}
+                    onClick={() =>
+                      setVideoFile("/templates/template2/video6.mp4")
+                    }
+                  >
+                    <div className="template-video bg-gray-200 rounded-sm">
+                      <video
+                        src="/templates/template2/video6.mp4"
+                        className="w-20 h-12 p-1"
+                      ></video>
+                    </div>
+                    <div className="template-info text-center flex-grow pl-3">
+                      <div className="h-full flex font-medium text-md">
+                        Blue
                       </div>
                     </div>
                   </div>
                   <div
                     className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
-                      videoFile === "/templates/template1/video8.mp4"
+                      videoFile === "/templates/template2/video7.mp4"
                         ? "border-blue-500"
                         : "border-gray-300"
                     }`}
                     onClick={() =>
-                      setVideoFile("/templates/template1/video8.mp4")
+                      setVideoFile("/templates/template2/video7.mp4")
                     }
                   >
                     <div className="template-video bg-gray-200 rounded-sm">
                       <video
-                        src="/templates/template1/video8.mp4"
+                        src="/templates/template2/video7.mp4"
                         className="w-20 h-12 p-1"
                       ></video>
                     </div>
                     <div className="template-info text-center flex-grow pl-3">
                       <div className="h-full flex font-medium text-md">
-                        Blue Plain
+                        Green
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
+                      videoFile === "/templates/template2/video8.mp4"
+                        ? "border-blue-500"
+                        : "border-gray-300"
+                    }`}
+                    onClick={() =>
+                      setVideoFile("/templates/template2/video8.mp4")
+                    }
+                  >
+                    <div className="template-video bg-gray-200 rounded-sm">
+                      <video
+                        src="/templates/template2/video8.mp4"
+                        className="w-20 h-12 p-1"
+                      ></video>
+                    </div>
+                    <div className="template-info text-center flex-grow pl-3">
+                      <div className="h-full flex font-medium text-md">
+                        Yellow
                       </div>
                     </div>
                   </div>

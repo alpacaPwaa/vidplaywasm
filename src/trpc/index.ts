@@ -94,7 +94,7 @@ export const appRouter = router({
       const allQuestion = await openai.completions.create({
         model: "gpt-3.5-turbo-instruct",
         prompt:
-          "Write 1 general knowledge quiz with 4 choices and answer. Keep the question short and simple. " +
+          "Write 1 unique general knowledge quiz with 4 choices and answer. Keep the question short and simple. Avoid duplicate and repetitive questions. " +
           input.prompt +
           " Avoid duplicate questions. Always start with keyword Question:, example Question: question. Then the choices, A, B, C, and D. Lastly, the correct answer which always must begin with the keyword Answer:, then the correct answer, example: Answer. A. Correct Answer.",
         temperature: 1,

@@ -3,14 +3,13 @@
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
 import { useEffect, useRef, useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/app/_trpc/client";
 import { Button } from "../ui/button";
 import { CheckCheck, Ghost, Loader2, Video } from "lucide-react";
 
 export default function QuizTemplate() {
   const [transcodeFile, setTranscodeFile] = useState<string | null>(null);
-  const [videoFile, setVideoFile] = useState("/templates/template1/video1.mp4");
+  const [videoFile, setVideoFile] = useState("/templates/template1/video4.mp4");
   const [voice, setVoice] = useState<
     "alloy" | "echo" | "fable" | "onyx" | "nova" | "shimmer"
   >("alloy");
@@ -321,7 +320,7 @@ export default function QuizTemplate() {
                       width: "100%",
                       height: "100px",
                     }}
-                    placeholder="Example: Geography a fun quiz for kids and adult"
+                    placeholder="Example: A fun quiz for kids and adult"
                   />
                 </div>
 
@@ -599,7 +598,7 @@ export default function QuizTemplate() {
                   >
                     <div className="template-video bg-gray-200 rounded-sm">
                       <video
-                        src="/templates/template1/video4.mp4"
+                        src="/templates/template1/video4t.mp4"
                         className="w-20 h-12 p-1"
                       ></video>
                     </div>

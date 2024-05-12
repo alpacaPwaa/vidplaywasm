@@ -66,10 +66,7 @@ const Dashboard = () => {
           </div>
         </li>
 
-        <li
-          className="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow transition hover:shadow-lg cursor-pointer"
-          onClick={handleRiddleMethis}
-        >
+        <li className="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow transition hover:shadow-lg cursor-pointer">
           <div className="flex w-full items-center justify-center">
             <Image
               src="/templates-thumbnail/coomingsoon.png"

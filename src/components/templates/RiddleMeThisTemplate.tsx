@@ -585,7 +585,7 @@ export default function RiddleMeThisTemplate() {
                         Yellow Plain
                       </div>
                     </div>
-                  </div>
+                  </div> */}
                   <div
                     className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
                       videoFile === "/templates/template2/video4.mp4"
@@ -604,10 +604,10 @@ export default function RiddleMeThisTemplate() {
                     </div>
                     <div className="template-info text-center flex-grow pl-3">
                       <div className="h-full flex font-medium text-md">
-                        Orange Plain
+                        Tiktok
                       </div>
                     </div>
-                  </div> */}
+                  </div>
                   <div
                     className={`template-container border rounded-md p-2 cursor-pointer flex items-center ${
                       videoFile === "/templates/template2/video5.mp4"

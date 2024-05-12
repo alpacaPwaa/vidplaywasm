@@ -321,7 +321,7 @@ export default function QuizTemplate() {
                       width: "100%",
                       height: "100px",
                     }}
-                    placeholder="Example: Geography Quiz"
+                    placeholder="Example: Geography a fun quiz for kids and adult"
                   />
                 </div>
 

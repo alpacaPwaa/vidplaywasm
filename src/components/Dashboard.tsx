@@ -65,6 +65,84 @@ const Dashboard = () => {
             Riddle Me This
           </div>
         </li>
+
+        <li
+          className="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow transition hover:shadow-lg cursor-pointer"
+          onClick={handleRiddleMethis}
+        >
+          <div className="flex w-full items-center justify-center">
+            <Image
+              src="/templates-thumbnail/coomingsoon.png"
+              alt="product preview"
+              className="p-1"
+              width={75}
+              height={10}
+            />
+          </div>
+          <div className="flex w-full items-center font-semibold p-2">
+            Q & A
+          </div>
+        </li>
+
+        <li className="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow transition hover:shadow-lg cursor-pointer">
+          <div className="flex w-full items-center justify-center">
+            <Image
+              src="/templates-thumbnail/coomingsoon.png"
+              alt="product preview"
+              className="p-1"
+              width={75}
+              height={10}
+            />
+          </div>
+          <div className="flex w-full items-center font-semibold p-2">
+            Fill In The blank
+          </div>
+        </li>
+
+        <li className="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow transition hover:shadow-lg cursor-pointer">
+          <div className="flex w-full items-center justify-center">
+            <Image
+              src="/templates-thumbnail/coomingsoon.png"
+              alt="product preview"
+              className="p-1"
+              width={75}
+              height={10}
+            />
+          </div>
+          <div className="flex w-full items-center font-semibold p-2">
+            Easy to Difficult Quiz
+          </div>
+        </li>
+
+        <li className="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow transition hover:shadow-lg cursor-pointer">
+          <div className="flex w-full items-center justify-center">
+            <Image
+              src="/templates-thumbnail/coomingsoon.png"
+              alt="product preview"
+              className="p-1"
+              width={75}
+              height={10}
+            />
+          </div>
+          <div className="flex w-full items-center font-semibold p-2">
+            Would You Rather?
+          </div>
+        </li>
+
+        <li className="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow transition hover:shadow-lg cursor-pointer">
+          <div className="flex w-full items-center justify-center">
+            <Image
+              src="/templates-thumbnail/coomingsoon.png"
+              alt="product preview"
+              className="p-1"
+              width={75}
+              height={10}
+            />
+          </div>
+          <div className="flex w-full items-center font-semibold p-2">
+            Logo Quiz
+          </div>
+        </li>
       </ul>
     </main>
   );

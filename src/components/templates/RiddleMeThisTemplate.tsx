@@ -9,7 +9,7 @@ import { CheckCheck, Ghost, Loader2, Video } from "lucide-react";
 
 export default function RiddleMeThisTemplate() {
   const [transcodeFile, setTranscodeFile] = useState<string | null>(null);
-  const [videoFile, setVideoFile] = useState("/templates/template1/video4.mp4");
+  const [videoFile, setVideoFile] = useState("/templates/template2/video4.mp4");
   const [voice, setVoice] = useState<
     "alloy" | "echo" | "fable" | "onyx" | "nova" | "shimmer"
   >("alloy");

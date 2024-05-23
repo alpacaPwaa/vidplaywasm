@@ -28,13 +28,22 @@ async function NavBar() {
             {!user ? (
               <>
                 <Link
-                  href="/pricing"
+                  href="/about"
                   className={buttonVariants({
                     variant: "ghost",
                     size: "sm",
                   })}
                 >
-                  Pricing
+                  About Us
+                </Link>
+                <Link
+                  href="/contact"
+                  className={buttonVariants({
+                    variant: "ghost",
+                    size: "sm",
+                  })}
+                >
+                  Contact Us
                 </Link>
                 <LoginLink
                   className={buttonVariants({
@@ -49,7 +58,7 @@ async function NavBar() {
                     size: "sm",
                   })}
                 >
-                  Get Started <ArrowRight className="ml-1.5 h-5 w-5" />
+                  Get Started For FREE <ArrowRight className="ml-1.5 h-5 w-5" />
                 </RegisterLink>
               </>
             ) : (

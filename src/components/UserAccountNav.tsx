@@ -45,13 +45,14 @@ async function UserAccountNav({ email, imageUrl, name }: UserAccountNavProps) {
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem asChild>
+        <DropdownMenuItem className="cursor-pointer" asChild>
           <Link href="/dashboard">Dashboard</Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/pricing">
-            Upgrade <Gem className="text-blue-600 h-4 w-4 ml-1.5" />
-          </Link>
+        <DropdownMenuItem className="cursor-pointer" asChild>
+          <Link href="/contact">Contact Us</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem className="cursor-pointer" asChild>
+          <Link href="/about">About Us</Link>
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />

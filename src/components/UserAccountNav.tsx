@@ -49,9 +49,6 @@ async function UserAccountNav({ email, imageUrl, name }: UserAccountNavProps) {
           <Link href="/dashboard">Dashboard</Link>
         </DropdownMenuItem>
         <DropdownMenuItem className="cursor-pointer" asChild>
-          <Link href="/contact">Contact Us</Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem className="cursor-pointer" asChild>
           <Link href="/about">About Us</Link>
         </DropdownMenuItem>
 

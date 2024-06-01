@@ -36,15 +36,6 @@ async function NavBar() {
                 >
                   About Us
                 </Link>
-                <Link
-                  href="/contact"
-                  className={buttonVariants({
-                    variant: "ghost",
-                    size: "sm",
-                  })}
-                >
-                  Contact Us
-                </Link>
                 <LoginLink
                   className={buttonVariants({
                     variant: "ghost",

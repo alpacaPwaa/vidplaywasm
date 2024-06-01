@@ -23,13 +23,13 @@ const Page = () => {
               Our Mission
             </h2>
             <p className="mt-4 text-lg text-gray-600">
-              At Tumndig, we&apos;re dedicated to revolutionizing content
-              creation by providing innovative tools that empower creators to
-              effortlessly craft high-quality mini-games for their social media
-              platforms. Our mission is to transform content creation into a
-              delightful and interactive experience for all, ensuring that every
-              creator can unleash their creativity and engage their audience
-              like never before.
+              At Tumndig, we&apos;re dedicated to creating content creation more
+              accessible by providing innovative tools that empower creators to
+              effortlessly craft high-quality short form content for their
+              social media platforms. Our mission is to transform content
+              creation into a delightful and interactive experience for all,
+              ensuring that every creator can unleash their creativity and
+              engage their audience like never before.
             </p>
           </div>
         </div>
